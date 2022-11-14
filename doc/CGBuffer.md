@@ -9,6 +9,8 @@ AxVector2UI ThreadBlockInfo(AxUInt32 blockSize, uInt64 numThreads)
 	return MakeVector2UI(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
 }
 
+
+
 class CGBufferBase
 {
 public:
@@ -18,7 +20,6 @@ public:
     virtual bool LoadToDevice()		  { return false; };
 	virtual bool LoadToHost()		  { return false; };
 
-    static CGBufferBase* Load(std::string path);
 }
 
 
@@ -50,14 +51,13 @@ typedef CGBuffer<double> BufferFp64;
 
 ```
 ```C++
+//Assembly
 int main()
 {
     //load from disk
-    auto posBuffer = (BufferV3*)CGBufferBase::Load("D:/CodeGenerator/P.rbuf");
-    auto massBuffer = (BufferFp32*)CGBufferBase::Load("D:/CodeGenerator/Mass.rbuf");
 
-    BufferV3::Load("D:/CodeGenerator/P.rbuf");
-    BufferFp32::Load("D:/CodeGenerator/Mass.rbuf");
+    auto posBuffer =  BufferV3::Load("D:/CodeGenerator/P.rbuf");
+    auto massBuffer =  BufferFp32::Load("D:/CodeGenerator/Mass.rbuf");
 
     posBuffer.LoadToDevice();
     posBuffer.LoadToHost();
