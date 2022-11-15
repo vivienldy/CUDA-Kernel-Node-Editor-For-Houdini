@@ -23,46 +23,45 @@ class CGBufferBase {
 protected:
 	uint32_t m_bufferSize;
 	std::string bufferNmae;
+	bool isMalloc;
+
 public:
 	CGBufferBase()
-		: m_bufferSize(0), bufferNmae("")
+		: CGBufferBase(0, "Autonomy")
 	{
 
 	}
-	uint32_t size() {
-		return m_bufferSize;
+
+	CGBufferBase(int size)
+		: CGBufferBase(size, "Autonomy") {}
+
+	CGBufferBase(int size, std::string name)
+		: m_bufferSize(size), bufferNmae(name), isMalloc(false)
+	{
+
 	}
 
-	void print() {
-		std::cout << "This is a parent function." << std::endl;
+	std::string getName() {
+		return bufferNmae;
+	}
+
+	uint32_t size() {
+		return m_bufferSize;
 	}
 
 	void setSize(uint32_t size) {
 		m_bufferSize = size;
 	}
 
-	//template<typename T>
-	//void addValue(T) {};
-
-	//template<typename T>
-	//T* getRawData() {};
-
-	//template<typename T>
-	//T* getDevicePointer() {};
-
-	//virtual bool malloc() = 0;
-
-	//virtual bool loadHostToDevice() = 0;
-
-	//virtual bool loadDeviceToHost() = 0;
-
-	//virtual void clear() {};
+	bool hasMemory() {
+		return isMalloc;
+	}
 
 	virtual ~CGBufferBase() {};
 };
 
 template<class T>
-class CGBuffer: public CGBufferBase {
+class CGBuffer : public CGBufferBase {
 private:
 	std::vector<T> m_data;
 	T* m_devicePtr;
@@ -72,11 +71,17 @@ public:
 		: CGBufferBase(),
 		m_devicePtr(nullptr)
 	{
-		std::cout << "CGBuffer created" << std::endl;
+
 	}
 
 	CGBuffer(int size, T value)
-		: CGBufferBase(), 
+		: CGBufferBase(size),
+		m_data(std::vector<T>(size, value)), m_devicePtr(nullptr)
+	{
+	}
+
+	CGBuffer(std::string name, int size, T value)
+		: CGBufferBase(size, name),
 		m_data(std::vector<T>(size, value)), m_devicePtr(nullptr)
 	{
 	}
@@ -86,10 +91,24 @@ public:
 		m_bufferSize = m_data.size();
 	}
 
-	void print() {
-		std::cout << sizeof(T) << std::endl;
-		std::cout << "This is a derived function." << std::endl;
-		std::cout << m_data[0][0] << ", "<<m_data[0][1] << ", " << m_data[0][2] << std::endl;
+	void copy(CGBuffer<T>* object) {
+		std::vector<T> vec = object->getData();
+		m_data = std::vector<T>(vec.begin(), vec.end());
+
+		m_bufferSize = object->size();
+
+		if (object->hasMemory()) {
+			this->malloc();
+			this->loadFromDevice(object->getDevicePointer(), -1, false);
+		}
+	}
+
+	CGBuffer<T>* clone() {
+		CGBuffer<T>* object = new CGBuffer<T>();
+
+		object->copy(this);
+
+		return object;
 	}
 
 	T* getRawData() {
@@ -98,6 +117,10 @@ public:
 
 	std::vector<T> getData() {
 		return m_data;
+	}
+
+	void setHostData(std::vector<T>& v) {
+		m_data = std::vector<T>(v.begin(), v.end());
 	}
 
 	T* getDevicePointer() {
@@ -110,6 +133,7 @@ public:
 	}
 
 	bool malloc() {
+		isMalloc = true;
 		cudaMalloc((void**)&m_devicePtr, m_bufferSize * sizeof(T));
 		return true;
 	}
@@ -120,17 +144,24 @@ public:
 	}
 
 	bool loadDeviceToHost() {
-		cudaMemcpy(m_data.data(), m_devicePtr,  m_bufferSize * sizeof(T), cudaMemcpyDeviceToHost);
+		m_data.resize(m_bufferSize);
+		cudaMemcpy(m_data.data(), m_devicePtr, m_bufferSize * sizeof(T), cudaMemcpyDeviceToHost);
 		return true;
 	}
 
-	bool loadFromDevice(T* devicePtr, int N=-1){
+	bool loadFromDevice(T* devicePtr, int N = -1, bool toHost=true) {
 		if (N == -1) {
 			N = m_bufferSize;
 		}
 		N = min(N, m_bufferSize);
 
+		checkMalloc();
 		cudaMemcpy(m_devicePtr, devicePtr, N * sizeof(T), cudaMemcpyDeviceToDevice);
+
+		if (toHost) {
+			this->loadDeviceToHost();
+		}
+
 		return true;
 	}
 
@@ -140,16 +171,43 @@ public:
 		}
 		N = min(N, m_bufferSize);
 
+		checkMalloc();
 		cudaMemcpy(devicePtr, m_devicePtr, N * sizeof(T), cudaMemcpyDeviceToDevice);
 		return true;
 	}
 
+	void checkMalloc() {
+		if (!isMalloc) {
+			this->malloc();
+		}
+	}
+
 	static CGBufferBase* loadFromFile(std::string filename);
+	static CGBuffer<T>* loadFromFileCGBuffer(std::string filename) {
+		return dynamic_cast<CGBuffer<T>*>(loadFromFile(filename));
+	}
 
 	void clear() {
 		m_data.clear();
 		m_bufferSize = 0;
+		isMalloc = false;
 		cudaFree(m_devicePtr);
+	}
+
+	void outputObj(std::string filename = "testing.obj") {
+		std::string objContent = "g\n";
+
+		std::string type = typeid(T).name(); //struct glm::tvec3<float,0>
+		for (auto data : m_data) {
+			if (type == "struct glm::tvec3<float,0>") {
+				objContent += "v " + std::to_string(data[0]) + " " + std::to_string(data[1]) + " " + std::to_string(data[2]) + "\n";
+			}
+		}
+
+		std::ofstream myfile;
+		myfile.open(filename);
+		myfile << objContent;
+		myfile.close();
 	}
 
 	~CGBuffer() {
@@ -182,7 +240,7 @@ CGBufferBase* CGBuffer<T>::loadFromFile(std::string filename) {
 
 	int offset = 1;
 
-	CGBufferBase *instance;
+	CGBufferBase* instance;
 	if (valueType == "3f") {
 		CGBuffer<glm::vec3>* o1 = new CGBuffer<glm::vec3>();
 
@@ -198,18 +256,21 @@ CGBufferBase* CGBuffer<T>::loadFromFile(std::string filename) {
 		return instance;
 	}
 
-
-
 	return instance;
 }
 
-/**
-* C main function.
-*/
-int main(int argc, char* argv[]) {
-	std::string filename = "../geoData_example.txt";
-	posBuffer = dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(filename));
-	posBuffer->resize();
-	posBuffer->malloc();
-	posBuffer->loadFromDevice(dev_pos);
-}
+///**
+//* C main function.
+//*/
+//int main(int argc, char* argv[]) {
+//	std::string filename = "../geoData_example.txt";
+//	CGBuffer<glm::vec3>* posBuffer = dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(filename));
+//	posBuffer->malloc();
+//  posBuffer->loadHostToDevice();
+// 
+//  CGBuffer<glm::vec3>* posTemp = new CGBuffer<glm::vec3>();
+//	posTemp->copy(posBuffer);
+//  posTemp = posBuffer.clone();
+//
+//  posBuffer.outputObj();
+//}
