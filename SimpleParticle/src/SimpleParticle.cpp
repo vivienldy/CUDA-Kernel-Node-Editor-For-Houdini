@@ -22,12 +22,12 @@ void CodeGenerator::ParticleAdvect(
      
      auto __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer->getRawData();
      auto __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getRawData();
-     auto __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getRawData();
-     auto __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getRawData();
-     auto __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getRawData();
-     auto __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getRawData();
+     auto __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer->getRawData();
+     auto __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer->getRawData();
+     auto __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer->getRawData();
+     auto __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->getRawData();
      
-     auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getRawData();
+     auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer_raw = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer->getRawData();
 
      int numThreads = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->getSize();
 
@@ -107,7 +107,7 @@ int main() // ? 还是main函数应该是现在单独的main.cpp 里
 
     // ===== load from another json???
     int startFrame = 0;
-    int endFrame = 10;
+    int endFrame = 500;
     float FPS = 24.f;
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
@@ -157,5 +157,13 @@ int main() // ? 还是main函数应该是现在单独的main.cpp 里
         outputObjFilePath.append(frame);
         outputObjFilePath.append(".obj");
         geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer->outputObj(outputObjFilePath);
+
+        // because now input buffer and output buffer are different
+        // need to pingpong buffer
+          // dynamically create and initialize vbuffer
+        auto tempPos = new CGBuffer<glm::vec3>("tempPos", numPoints, glm::vec3(0.f));
+        tempPos->copy(geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer);
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->copy(geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer);
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer->copy(tempPos);
     }
 }
