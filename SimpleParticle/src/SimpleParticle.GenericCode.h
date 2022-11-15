@@ -7,11 +7,11 @@ namespace CodeGenerator
 { 
     namespace GenericCode
     {
-        glm::vec3 curlnoise(glm::vec3 pos,  glm::vec3 freq, float amp, int turb) {
+        __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos,  glm::vec3 freq, float amp, int turb) {
             return glm::vec3(1.f);
         }
 
-        void particleAdvect(
+        __host__ __device__ inline void particleAdvect(
             int geo1_solver1_d_s_pointvop2__DEBUG_turb_turb, 
             float geo1_solver1_d_s_pointvop2__DEBUG_amp_amp, 
             glm::vec3 geo1_solver1_d_s_pointvop2__DEBUG_freq_freq, 
