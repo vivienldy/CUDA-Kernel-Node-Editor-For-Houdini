@@ -41,11 +41,7 @@ public:
 
 	}
 
-	std::string getName() {
-		return bufferNmae;
-	}
-
-	uint32_t size() {
+	uint32_t getSize() {
 		return m_bufferSize;
 	}
 
@@ -55,6 +51,14 @@ public:
 
 	bool hasMemory() {
 		return isMalloc;
+	}
+
+	std::string getName(){
+		return bufferNmae;
+	}
+
+	void setName(std::string name){
+		bufferNmae = name;
 	}
 
 	virtual ~CGBufferBase() {};
@@ -265,6 +269,7 @@ CGBufferBase* CGBuffer<T>::loadFromFile(std::string filename) {
 //int main(int argc, char* argv[]) {
 //	std::string filename = "../geoData_example.txt";
 //	CGBuffer<glm::vec3>* posBuffer = dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(filename));
+//  CGBuffer<glm::vec3>* velBuffer = new CGBuffer<glm::vec3>("buffer name", 10000, glm::vec3(1.f));
 //	posBuffer->malloc();
 //  posBuffer->loadHostToDevice();
 // 
