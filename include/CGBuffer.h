@@ -83,6 +83,7 @@ public:
 
 	void addVlaue(T value) {
 		m_data.push_back(value);
+		m_bufferSize = m_data.size();
 	}
 
 	void print() {
@@ -103,7 +104,7 @@ public:
 		return m_devicePtr;
 	}
 
-	void resize(int size) {
+	void setSize(int size) {
 		m_data.resize(size);
 		m_bufferSize = size;
 	}
