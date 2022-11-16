@@ -5,8 +5,8 @@
 #include "CGBuffer.h"
 #include "SimpleParticle.GenericCode.h"
 
-#define CPU_VERSION 1
-#define GPU_VERSION 0
+#define CPU_VERSION 0
+#define GPU_VERSION 1
 
 namespace CodeGenerator
 {

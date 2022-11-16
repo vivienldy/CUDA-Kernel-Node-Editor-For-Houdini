@@ -149,18 +149,26 @@ int main() // ? 还是main函数应该是现在单独的main.cpp 里
             __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer,
             geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer,
             blockSize);
+        cudaDeviceSynchronize();
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer->loadDeviceToHost();
 #endif
 
         // save pos buffer as obj file
         std::string frame = std::to_string(Frame);
         std::string outputObjFilePath = "../userOutputData/pos_";
+// for debug
+#if CPU_VERSION
+        outputObjFilePath.append("cpu_");
+#elif GPU_VERSION
+        outputObjFilePath.append("gpu_");
+#endif
         outputObjFilePath.append(frame);
         outputObjFilePath.append(".obj");
+
         geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer->outputObj(outputObjFilePath);
 
         // because now input buffer and output buffer are different
         // need to pingpong buffer
-          // dynamically create and initialize vbuffer
         auto tempPos = new CGBuffer<glm::vec3>("tempPos", numPoints, glm::vec3(0.f));
         tempPos->copy(geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer);
         geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->copy(geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer);
