@@ -1,8 +1,10 @@
+#include <glm/glm.hpp>
+
 namespace CodeGenerator 
 { 
 	namespace GenericCode 
  	{ 
-        void #FUNC_NAME#(#PARM_LIST#)
+        __host__ __device__ inline void #FUNC_NAME#(#PARM_LIST#)
         {
             // Data Load 
             #DATA_LOAD#
