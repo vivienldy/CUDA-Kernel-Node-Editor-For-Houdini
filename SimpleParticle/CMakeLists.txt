@@ -63,12 +63,14 @@ include_directories(${GLM_INCLUDE_DIRS})
 
 set(headers
     src/CGBuffer.h
+    src/CGField.h
     src/SimpleParticle.cuh
     src/SimpleParticle.GenericCode.h
     src/SimpleParticle.h
     )
 
 set(sources
+    src/main.cpp
     src/SimpleParticle.cpp
     src/SimpleParticle.cu
     )

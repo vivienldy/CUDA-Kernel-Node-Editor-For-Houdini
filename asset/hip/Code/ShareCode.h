@@ -1,8 +1,10 @@
+#include <glm/glm.hpp>
+
 namespace CodeGenerator 
 { 
 	namespace GenericCode 
  	{ 
-        void pointvop2__DEBUG(int geo1_solver1_d_s_pointvop2__DEBUG_turb_turb, float geo1_solver1_d_s_pointvop2__DEBUG_amp_amp, glm::vec3 geo1_solver1_d_s_pointvop2__DEBUG_freq_freq, glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer, glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer, float geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_TimeInc, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer, glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer, int idx)
+        __host__ __device__ inline void pointvop2__DEBUG(int geo1_solver1_d_s_pointvop2__DEBUG_turb_turb, float geo1_solver1_d_s_pointvop2__DEBUG_amp_amp, glm::vec3 geo1_solver1_d_s_pointvop2__DEBUG_freq_freq, glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer, glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer, float geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_TimeInc, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer, glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer, glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer, int idx)
         {
             // Data Load 
             // Geometry Global Input
