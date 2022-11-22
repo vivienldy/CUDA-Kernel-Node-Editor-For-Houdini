@@ -1,0 +1,111 @@
+///
+#OUT_FILE_NAME# -> "output filename"
+#KERNEL_NAME# -> "kernel_name"
+#KERNEL_PARM_DECLARE_LIST# -> "global_input", "global_output"
+#FUNC_NAME# -> "func_name"
+#PARM_LIST# -> "global_input", "global_output"
+
+
+#KERNEL_LAUNCH_NAME# -> "kernel_launch_name"
+#KERNEL_LAUNCH_PARM_DECLARE_LIST# -> "global_input", "global_output"
+#BUFFER_MALLOC# -> "global_input", "global_output"
+#COMP_BLK_NUM#
+
+#KERNEL_PARM_INPUT_LIST# -> "global_input", "global_output"
+#KERNEL_LAUNCH_ERROR_MSG# ->"error msg"
+//
+
+
+{
+    "output filename": "SimpleParticle",
+    "kernel_launch_name": "particle_advect",
+    "kernel_name": "particle_advect",
+    "func_name":"particle_advect",
+    "error msg": "simpleparticle advect error",
+    "global_input":{
+        "geometryvopglobal1":[
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "p"
+            },
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "v"
+            },
+            {
+                "is_buffer": "False",
+                "type": "float",
+                "variable_name": "dt"
+            }
+        ],
+        "custom_param":[
+
+        ]
+    },
+    "compute_graph":{
+        "multiply1":{
+            "method_name": "multiply",
+            "input":[
+                {
+                    "local_input_name": "v"
+                },
+                {
+                    "local_input_name": "dt"
+                }
+            ],
+            "output":[
+                {
+                    "data_type":"glm::vec3",
+                    "local_output_name":"product1"
+                }
+            ]
+        },
+        "add1":{
+            "method_name": "add",
+            "input":[
+                {
+                    "local_input_name": "p"
+                },
+                {
+                    "local_input_name":"product1"
+                }
+            ],
+            "output":[
+                {
+                    "data_type":"glm::vec3",
+                    "local_output_name":"sum1"
+                }
+            ]
+        },
+        "turbnoise1":{
+            "method_name": "turbnoise",
+            "input":[
+                {
+                    "local_input_name": "p"
+                }
+            ],
+            "output":[
+                {
+                    "data_type": "glm::vec3",
+                    "local_output_name": "noise"
+                }
+            ]
+        }
+    },
+    "global_output":{
+        "geometryvopoutput1":[
+            {
+                "type": "glm::vec3",
+                "variable_name": "p",
+                "connection": "add1"
+            }
+        ],
+        "custom_param":[
+            {
+
+            }
+        ]
+    }
+}
