@@ -1,5 +1,5 @@
-#include "SimpleParticle.h"
-#include "SimpleParticle.cuh"
+#include "#OUT_FILE_NAME#.h"
+#include "#OUT_FILE_NAME#.cuh"
 
 #define checkCUDAErrorWithLine(msg) checkCUDAError(msg, __LINE__)
 /**
