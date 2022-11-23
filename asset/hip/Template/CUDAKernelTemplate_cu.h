@@ -27,7 +27,7 @@ __global__ void CodeGenerator::CUDAKernel::#KERNEL_NAME#(#KERNEL_PARM_DECLARE_LI
   if(index > numThreads)
     return;
 
-  CodeGenerator::GenericCode::#FUNC_NAME#(#PARM_LIST#, index);
+  CodeGenerator::GenericCode::#FUNC_NAME#(#SHARE_CODE_PARM_INPUT_LIST#, index);
 }
 
 void CodeGenerator::CUDA::#KERNEL_LAUNCH_NAME# (
@@ -38,7 +38,7 @@ void CodeGenerator::CUDA::#KERNEL_LAUNCH_NAME# (
     #BUFFER_MALLOC#
 
     // Compute threads num
-    int numOfThreads = #COMP_BLK_NUM#
+    int numOfThreads = #REF_BUFFER_NAME#->getSize();
     // Compute blocks num
     auto num_blocks_threads = ThreadBlockInfo(blockSize, numOfThreads);
     

@@ -1,27 +1,28 @@
 ///
-#OUT_FILE_NAME# -> "output filename"
+#OUT_FILE_NAME# -> "out_filename"
 #KERNEL_NAME# -> "kernel_name"
 #KERNEL_PARM_DECLARE_LIST# -> "global_input", "global_output"
 #FUNC_NAME# -> "func_name"
-#PARM_LIST# -> "global_input", "global_output"
+#SHARE_CODE_PARM_INPUT_LIST# -> "global_input", "global_output"
 
 
 #KERNEL_LAUNCH_NAME# -> "kernel_launch_name"
 #KERNEL_LAUNCH_PARM_DECLARE_LIST# -> "global_input", "global_output"
 #BUFFER_MALLOC# -> "global_input", "global_output"
-#COMP_BLK_NUM#
+#REF_BUFFER_NAME# -> "ref_buffer_name"
 
 #KERNEL_PARM_INPUT_LIST# -> "global_input", "global_output"
-#KERNEL_LAUNCH_ERROR_MSG# ->"error msg"
+#KERNEL_LAUNCH_ERROR_MSG# ->"error_msg"
 //
 
 
 {
-    "output filename": "SimpleParticle",
+    "out_filename": "SimpleParticle",
     "kernel_launch_name": "particle_advect",
     "kernel_name": "particle_advect",
     "func_name":"particle_advect",
     "error msg": "simpleparticle advect error",
+    "ref_buffer_name": "P",
     "global_input":{
         "geometryvopglobal1":[
             {
