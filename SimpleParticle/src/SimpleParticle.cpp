@@ -16,8 +16,7 @@ void CodeGenerator::ParticleAdvect(
     CGBuffer<glm::vec3>* __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer,
     CGBuffer<glm::vec3>* __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer,
     CGBuffer<glm::vec3>* __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer,
-    CGBuffer<glm::vec3>* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer,
-    CGBuffer<glm::vec3>* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer)
+    CGBuffer<glm::vec3>* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer)
 {
      auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer_raw = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->getRawData();
      auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer_raw = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer->getRawData();
@@ -29,8 +28,6 @@ void CodeGenerator::ParticleAdvect(
      auto __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer->getRawData();
      auto __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer_raw = __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->getRawData();
      
-     auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer_raw = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer->getRawData();
-
      int numThreads = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->getSize();
 
      for(int i = 0; i < numThreads; ++i){
@@ -47,7 +44,6 @@ void CodeGenerator::ParticleAdvect(
               __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer_raw,
               __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer_raw,
               __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer_raw,
-              geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer_raw,
               i);
      }
 }

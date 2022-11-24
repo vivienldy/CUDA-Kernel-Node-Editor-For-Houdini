@@ -24,7 +24,6 @@ namespace CodeGenerator
             glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer,
             glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer,
             glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer, 
-            glm::vec3* geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer, 
             int idx) {
 
             // Data Load 
@@ -65,8 +64,7 @@ namespace CodeGenerator
             __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer[idx] = __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug;
 
             glm::vec3 global_output_geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_P = geo1_solver1_d_s_pointvop2__DEBUG_add2_sum;
-            geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_Pbuffer[idx] = global_output_geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_P;
+            geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer[idx] = global_output_geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_P;
         }
-
     }
 } 

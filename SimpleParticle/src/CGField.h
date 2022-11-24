@@ -22,7 +22,7 @@ struct CGField3DInfo
     glm::vec3 FieldSize; // size of the field
     glm::vec3 Resolution; // every side voxel count
     float VoxelSize; // size of one voxel
-    float HalfVoxelSize;
+    float InverseVoxelSize;
     int NumVoxels; // voxel count of the field
 };
 
@@ -80,7 +80,7 @@ public:
     }
 
     ~CGField3D() {
-
+        m_VoxelBuffer.clear();
     }
 
     // ---------- Initializing Field
@@ -94,10 +94,10 @@ public:
         std::string voxelBufferFilePath = "") 
     {
         // initialize m_FieldInfo
-        SetPivot(pivot);
-        SetFieldResolution(res);
-        SetFieldSize(fieldSize);
-        SetVoxelSize(voxelSize);
+        this->SetPivot(pivot);
+        this->SetFieldResolution(res);
+        this->SetFieldSize(fieldSize);
+        this->SetVoxelSize(voxelSize);
 
         // initialize m_VoxelBuffer
         m_VoxelBuffer.setName(name + ".voxels");
@@ -132,13 +132,38 @@ public:
 
     void SetVoxelSize(float size) {
         m_FieldInfo.VoxelSize = size;
-        m_FieldInfo.HalfVoxelSize = size * 0.5f;
+        m_FieldInfo.InverseVoxelSize = 1.0 / size;
+    }
+    // ---------- CUDA fucntion
+    bool DeviceMalloc()
+    {
+        return m_VoxelBuffer.malloc();
+    }
+
+    void LoadToHost()
+    {
+        m_VoxelBuffer.loadDeviceToHost();
+    }
+
+    void LoadToDevice()
+    {
+        m_VoxelBuffer.loadHostToDevice();
+    }
+
+    T* GetRawDataDevice()
+    {
+        return m_VoxelBuffer.getDevicePointer();
     }
 
     // ---------- helper function
-    // if m_VoxelBuffer has device pointer
-    bool HasDeviceData() {
-
+    // for easy copy field info from other field
+    void Match(const CGField3D<T>& other)
+    {
+        CGField3DInfo info = other.GetFieldInfo();
+        this->SetPivot(pivot);
+        this->SetFieldResolution(res);
+        this->SetFieldSize(fieldSize);
+        this->SetVoxelSize(voxelSize);
     }
 
     void SetToZero()
@@ -156,6 +181,131 @@ public:
         return this->m_FieldInfo;
     }
 
+    T* GetRawData() {
+        return m_VoxelBuffer.getRawData();
+    }
+
+    void Release() {
+        m_VoxelBuffer.clear();
+    }
+
+    bool HasDeviceData() {
+        return m_VoxelBuffer.hasMemory();
+    }
+};
+
+
+template<class T>
+class CGVectorField3D
+{
+public:
+    CGField3D<T>* m_FieldX;
+    CGField3D<T>* m_FieldY;
+    CGField3D<T>* m_FieldZ;
+
+    // ---------- Pack Field Info for CPU and GPU
+   // ShareCode will use this struct 
+   // CPU and GPU data are different but use the same struct
+    struct RAWData {
+        bool IsValid; // prevent pass nullptr as parameter
+        T* VoxelDataX;
+        T* VoxelDataY;
+        T* VoxelDataZ;
+        CGField3DInfo FieldInfoX;
+        CGField3DInfo FieldInfoY;
+        CGField3DInfo FieldInfoZ;
+    };
+
+    RAWData GetFieldRAWData()
+    {
+        RAWData rawData;
+        rawData.VoxelDataX = this->m_FieldX->GetRawData();
+        rawData.VoxelDataY = this->m_FieldY->GetRawData();
+        rawData.VoxelDataZ = this->m_FieldZ->GetRawData();
+        rawData.FieldInfoX = this->m_FieldX->GetFieldInfo();
+        rawData.FieldInfoY = this->m_FieldY->GetFieldInfo();
+        rawData.FieldInfoZ = this->m_FieldZ->GetFieldInfo();
+        //rawData.IsStaggeredGrid = IsStaggeredGrid();
+        return desc;
+    }
+
+    RAWData GetFieldRAWDataDevice()
+    {
+        RAWData rawData;
+        rawData.VoxelDataX = this->m_FieldX->GetRawDataDevice();
+        rawData.VoxelDataY = this->m_FieldY->GetRawDataDevice();
+        rawData.VoxelDataZ = this->m_FieldZ->GetRawDataDevice();
+        rawData.FieldInfoX = this->m_FieldX->GetFieldInfo();
+        rawData.FieldInfoY = this->m_FieldY->GetFieldInfo();
+        rawData.FieldInfoZ = this->m_FieldZ->GetFieldInfo();
+        //rawData.IsStaggeredGrid = IsStaggeredGrid();
+        return desc;
+    }
+
+    // ---------- Constructor
+    CGVectorField3D()
+    {
+        this->m_FieldX = nullptr;
+        this->m_FieldY = nullptr;
+        this->m_FieldZ = nullptr;
+    }
+
+    CGVectorField3D(
+        CGField3D<T>* x, 
+        CGField3D<T>* y, 
+        CGField3D<T>* z, 
+        std::string name = "v")
+    {
+        m_FieldX = x;
+        m_FieldY = y;
+        m_FieldZ = z;
+        m_sName = name;
+    }
+
+    ~CGVectorField3D()
+    {
+        m_FieldX->Release();
+        m_FieldY->Release();
+        m_FieldZ->Release();
+    }
+
+    // ---------- CUDA fucntion
+    bool DeviceMalloc()
+    {
+        if (!this->IsValid())
+            return false;
+        m_FieldX->DeviceMalloc();
+        m_FieldY->DeviceMalloc();
+        m_FieldZ->DeviceMalloc();
+        return true;
+    }
+
+    void LoadToHost()
+    {
+        m_FieldX->LoadToHost();
+        m_FieldY->LoadToHost();
+        m_FieldZ->LoadToHost();
+    }
+
+    void LoadToDevice()
+    {
+        m_FieldX->LoadToDevice();
+        m_FieldY->LoadToDevice();
+        m_FieldZ->LoadToDevice();
+    }
+
+    // ---------- helper function
+    // whether three fields all have data
+    bool IsValid() {
+        return ((this->m_FieldX != nullptr) || (this->m_FieldY != nullptr) || (this->m_FieldZ != nullptr));
+    }
+
+    bool AllFieldHashDeviceData()
+    {
+        if (!this->IsValid())
+            return false;
+        return m_FieldX->HasDeviceData() && m_FieldY->HasDeviceData() && m_FieldZ->HasDeviceData();
+    }
 };
 
 void testFieldMain() {
