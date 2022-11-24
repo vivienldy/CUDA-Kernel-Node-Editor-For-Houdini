@@ -1,4 +1,4 @@
-#include "#FILE_NAME#.h"
+#include "#PROJ_NAME#.h"
 
 #include "CGField.h"
 

@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 
 #include "CGBuffer.h"
-#include "#OUT_FILE_NAME#.GenericCode.h"
+#include "#PROJ_NAME#.GenericCode.h"
 
 
 namespace CodeGenerator
