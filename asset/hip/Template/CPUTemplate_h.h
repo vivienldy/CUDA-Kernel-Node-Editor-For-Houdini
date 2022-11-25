@@ -10,6 +10,6 @@ namespace CodeGenerator
     void #FUNC_NAME#(#FUNC_DECLARE_LIST#);
     namespace CUDA 
     {
-        void #FUNC_NAME#(#FUNC_DELCARE_LIST#, int blockSize=512);
+        void #FUNC_NAME#(#FUNC_DECLARE_LIST#, int blockSize=512);
     }
 }
