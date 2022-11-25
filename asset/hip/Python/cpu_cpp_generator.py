@@ -82,7 +82,10 @@ def shareCodeParamGenerator(jsonObj):
         # for custom_param
         else:
             for input_port in input_node:
-                result += input_port["variable_name"] + ", "
+                if input_port["is_buffer"] == "True":
+                    result += input_port["variable_name"] + "buffer" + "->getRawData()" + ", "  #i.e. pos->getRawData(),
+                else:
+                    result += input_port["variable_name"] + ", "
     
     global_output = jsonObj["global_output"]
     for output_node_key in global_output:
