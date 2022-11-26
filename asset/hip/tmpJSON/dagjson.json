@@ -51,6 +51,47 @@
                 }
             ]
         },
+        "fit2":{
+            "method_name":"fit",
+            "input":[
+                {
+                    "param_name":"val",
+                    "data_type":"float",
+                    "default_value":"CG_NONE",
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_TimeInc"
+                },
+                {
+                    "param_name":"srcmin",
+                    "data_type":"float",
+                    "default_value":"0.0",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"srcmax",
+                    "data_type":"float",
+                    "default_value":"1.0",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"destmin",
+                    "data_type":"float",
+                    "default_value":"0.0",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"destmax",
+                    "data_type":"float",
+                    "default_value":"1.0",
+                    "local_input_name":"CG_NONE"
+                }
+            ],
+            "output":[
+                {
+                    "data_type":"float",
+                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_fit2_shift"
+                }
+            ]
+        },
         "multiply3":{
             "method_name":"multiply",
             "input":[
@@ -65,10 +106,6 @@
                 {
                     "data_type":"glm::vec3",
                     "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product"
-                },
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product"
                 }
             ]
         },
@@ -77,97 +114,134 @@
             "input":[
                 {
                     "param_name":"type",
-                    "data_type":"string",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"Perlin Noise"
+                    "data_type":"char",
+                    "default_value":"pnoise",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"pos",
-                    "data_type":"point",
-                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product",
-                    "default_value":"CG_NONE"
+                    "data_type":"glm::vec3",
+                    "default_value":"CG_NONE",
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product"
                 },
                 {
                     "param_name":"freq",
-                    "data_type":"vector",
-                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_freq_freq",
-                    "default_value":"CG_NONE"
+                    "data_type":"glm::vec3",
+                    "default_value":"CG_NONE",
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_freq_freq"
                 },
                 {
                     "param_name":"offset",
-                    "data_type":"point",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"0.0,0.0,0.0"
+                    "data_type":"glm::vec3",
+                    "default_value":"0.0,0.0,0.0",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"amp",
                     "data_type":"float",
-                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_amp_amp",
-                    "default_value":"CG_NONE"
+                    "default_value":"CG_NONE",
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_amp_amp"
                 },
                 {
                     "param_name":"rough",
                     "data_type":"float",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"0.5"
+                    "default_value":"0.5",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"atten",
                     "data_type":"float",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"1.0"
+                    "default_value":"1.0",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"turb",
                     "data_type":"int",
-                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_turb_turb",
-                    "default_value":"CG_NONE"
+                    "default_value":"CG_NONE",
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_turb_turb"
                 },
                 {
                     "param_name":"h",
                     "data_type":"float",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"0.0001"
+                    "default_value":"0.0001",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"radius",
                     "data_type":"float",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"1.0"
+                    "default_value":"1.0",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"dist",
                     "data_type":"float",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"1.0"
+                    "default_value":"1.0",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"normal",
-                    "data_type":"vector",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"0.0,0.0,0.0"
+                    "data_type":"glm::vec3",
+                    "default_value":"0.0,0.0,0.0",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"sdf",
-                    "data_type":"string",
-                    "local_input_name":"CG_NONE",
-                    "default_value":""
+                    "data_type":"char",
+                    "default_value":"",
+                    "local_input_name":"CG_NONE"
                 },
                 {
                     "param_name":"bounce",
                     "data_type":"int",
-                    "local_input_name":"CG_NONE",
-                    "default_value":"0"
+                    "default_value":"0",
+                    "local_input_name":"CG_NONE"
                 }
             ],
             "output":[
                 {
                     "data_type":"glm::vec3",
                     "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise"
+                }
+            ]
+        },
+        "fit1":{
+            "method_name":"fit",
+            "input":[
+                {
+                    "param_name":"val",
+                    "data_type":"glm::vec3",
+                    "default_value":"CG_NONE",
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise"
                 },
                 {
+                    "param_name":"srcmin",
                     "data_type":"glm::vec3",
-                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise"
+                    "default_value":"0.0,0.0,0.0",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"srcmax",
+                    "data_type":"glm::vec3",
+                    "default_value":"1.0,1.0,1.0",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"destmin",
+                    "data_type":"glm::vec3",
+                    "default_value":"0.0,0.0,0.0",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"destmax",
+                    "data_type":"glm::vec3",
+                    "default_value":"1.0,1.0,1.0",
+                    "local_input_name":"CG_NONE"
+                }
+            ],
+            "output":[
+                {
+                    "data_type":"glm::vec3",
+                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_fit1_shift"
                 }
             ]
         },
@@ -178,14 +252,10 @@
                     "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise"
                 },
                 {
-                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_TimeInc"
+                    "local_input_name":"geo1_solver1_d_s_pointvop2__DEBUG_fit2_shift"
                 }
             ],
             "output":[
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product"
-                },
                 {
                     "data_type":"glm::vec3",
                     "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product"
@@ -206,10 +276,6 @@
                 {
                     "data_type":"glm::vec3",
                     "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_add1_sum"
-                },
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_add1_sum"
                 }
             ]
         },
@@ -224,10 +290,6 @@
                 }
             ],
             "output":[
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product"
-                },
                 {
                     "data_type":"glm::vec3",
                     "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product"
@@ -248,16 +310,17 @@
                 {
                     "data_type":"glm::vec3",
                     "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_add2_sum"
-                },
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"geo1_solver1_d_s_pointvop2__DEBUG_add2_sum"
                 }
             ]
         }
     },
     "global_output":{
         "custom_param":[
+            {
+                "connection":"geo1_solver1_d_s_pointvop2__DEBUG_fit1_shift",
+                "data_type":"glm::vec3",
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_fit1_shift_debug"
+            },
             {
                 "connection":"geo1_solver1_d_s_pointvop2__DEBUG_add2_sum",
                 "data_type":"glm::vec3",
@@ -277,11 +340,6 @@
                 "connection":"geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product",
                 "data_type":"glm::vec3",
                 "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug"
-            },
-            {
-                "connection":"geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise",
-                "data_type":"glm::vec3",
-                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug"
             },
             {
                 "connection":"geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product",
