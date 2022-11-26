@@ -4,11 +4,9 @@
 
 void CodeGenerator::#FUNC_NAME#(#FUNC_DECLARE_LIST#)
 {
-    #GET_RAWDATA#
-
-    int numThreads = #GET_DATA_SIZE#;
+    int numThreads = #GET_NUM_THREAD#;
 
     for(int index = 0; index < numThreads; ++index){
-        CodeGenerator::GenericCode::#FUNC_NAME#(#RAWDATA_LIST#, index);
+        CodeGenerator::GenericCode::#FUNC_NAME#(#SHARE_CODE_PARAM#, index);
     }
 }

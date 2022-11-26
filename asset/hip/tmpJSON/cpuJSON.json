@@ -16,7 +16,7 @@
         "#KERNEL_LAUNCH_ERROR_MSG#": "error_msg"
     },
 
-    "out_filename": "SimpleParticle",
+    "proj_name": "SimpleParticle",
     "kernel_launch_name": "particle_advect",
     "kernel_name": "particle_advect",
     "func_name":"particle_advect",
@@ -41,7 +41,31 @@
             }
         ],
         "custom_param":[
-
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "add2_sum_debug"
+            },
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "multiply2_product_debug"
+            },
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "add1_sum_debug"
+            },
+            {
+                "is_buffer": "False",
+                "type": "int",
+                "variable_name": "turb_turb"
+            },
+            {
+                "is_buffer": "False",
+                "type": "float",
+                "variable_name": "amp_amp"
+            }
         ]
     },
     "global_output":{
@@ -53,9 +77,7 @@
             }
         ],
         "custom_param":[
-            {
 
-            }
         ]
     }
 }
