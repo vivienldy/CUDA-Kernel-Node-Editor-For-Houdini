@@ -4,16 +4,16 @@ namespace CodeGenerator
 { 
 	namespace GenericCode 
  	{ 
-        __host__ __device__ inline void #FUNC_NAME#(#PARM_LIST#)
+        __host__ __device__ inline void @FUNC_NAME@(@PARM_LIST@)
         {
             // Data Load 
-            #DATA_LOAD#
+            @DATA_LOAD@
 
             // Compute graph
-            #COMPUTE_GRAPH#
+            @COMPUTE_GRAPH@
 
             // Write bacl
-            #WRITE_BACK#
+            @WRITE_BACK@
         }
 	} 
 } 

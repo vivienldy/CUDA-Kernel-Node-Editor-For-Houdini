@@ -10,9 +10,13 @@ json_str = json_str[0]
 jsonObj = json.loads(json_str)
 
 # Parse keywords from template
-template_input = this_node.input(2)
-template = template_input.parm("/obj/geo1/solver1/d/s/share_code_file_template/content").eval()
-code_segments = re.findall('#(.+?)#', template)
+template_input_cuh = this_node.input(1)
+template_cuh = template_input_cuh.parm("/obj/geo1/solver1/d/s/kernel_cuh_template/content").eval()
+code_segments_cuh = re.findall('@(.+?)@', template_cuh)
+
+template_input_cu = this_node.input(2)
+template_cu = template_input_cu.parm("/obj/geo1/solver1/d/s/kernel_cu_template/content").eval()
+code_segments_cu = re.findall('@(.+?)@', template_cu)
 
 # Codeline class
 class Codeline:
@@ -25,6 +29,20 @@ class Codeline:
         else:
             return ""
 
+# ----- Common ------
+def getInputBufferDict(jsonObj):
+    buffer_dict = {}
+   
+    global_input = jsonObj["global_input"] 
+    for input_node_key in global_input:
+        input_node = global_input[input_node_key]
+        
+        if input_node_key == "geometryvopglobal1":
+            for input_port in input_node:
+                if input_port["is_buffer"] == "True":
+                    buffer_dict[input_port["port_name"]] = input_port["variable_name"]
+    return buffer_dict
+    
 # ----- Code Segment Generators -----
 
 # File name
@@ -45,7 +63,7 @@ def kernelLaunchNameGenerator(jsonObj):
 
 # Kernel parm declare
 def kernelParmDeclareGenerator(jsonObj):
-    buffer_list = []
+    buffer_dict = getInputBufferDict(jsonObj)
     result = ""
     global_input = jsonObj["global_input"] 
     for input_node_key in global_input:
@@ -56,7 +74,6 @@ def kernelParmDeclareGenerator(jsonObj):
                 # check buffer type
                 if input_port["is_buffer"] == "True":
                     result += input_port["data_type"] + "* " + input_port["variable_name"] + "buffer" + ", "  #i.e. glm::vec3* posBuffer,
-                    buffer_list.append(input_port["variable_name"])
                 else:
                     result += input_port["data_type"] + " " + input_port["variable_name"] + ", "  #i.e. float dt,
         # for custom_param
@@ -73,7 +90,7 @@ def kernelParmDeclareGenerator(jsonObj):
                 # param in "geometryvopoutput1" are all buffer data
                 # we don't won't duplicate param
                 # only add the param if not in global input
-                if buffer_list.count(output_port["variable_name"]) == 0:
+                if not output_port["port_name"] in buffer_dict:
                     result += output_port["data_type"] + "* " + output_port["variable_name"] + "buffer" + ", "
         else:
             for output_port in output_node:
@@ -83,7 +100,7 @@ def kernelParmDeclareGenerator(jsonObj):
 
 # Kernel Launch parm declare
 def kernelLaunchParmDeclareGenerator(jsonObj):
-    buffer_list = []
+    buffer_dict = getInputBufferDict(jsonObj)
     result = ""
     global_input = jsonObj["global_input"] 
     for input_node_key in global_input:
@@ -94,7 +111,6 @@ def kernelLaunchParmDeclareGenerator(jsonObj):
                 # check buffer type
                 if input_port["is_buffer"] == "True":
                     result += "CGBuffer<" + input_port["data_type"] + ">" + "* " + input_port["variable_name"] + "buffer" + ", "  
-                    buffer_list.append(input_port["variable_name"])
                 else:
                     result += input_port["data_type"] + " " + input_port["variable_name"] + ", " 
         # for custom_param
@@ -111,7 +127,7 @@ def kernelLaunchParmDeclareGenerator(jsonObj):
                 # param in "geometryvopoutput1" are all buffer data
                 # we don't won't duplicate param
                 # only add the param if not in global input
-                if buffer_list.count(output_port["variable_name"]) == 0:
+                if not output_port["port_name"] in buffer_dict:
                     result += "CGBuffer<" + output_port["data_type"] + ">" + "* " + output_port["variable_name"] + "buffer" + ", "
         else:
             for output_port in output_node:
@@ -121,7 +137,7 @@ def kernelLaunchParmDeclareGenerator(jsonObj):
 
 # Share code parm input list
 def shareCodeParmInputListGenerator(jsonObj):
-    buffer_list = []
+    buffer_dict = getInputBufferDict(jsonObj)
     result = ""
     global_input = jsonObj["global_input"] 
     for input_node_key in global_input:
@@ -132,7 +148,6 @@ def shareCodeParmInputListGenerator(jsonObj):
                 # check buffer type
                 if input_port["is_buffer"] == "True":
                     result += input_port["variable_name"] + "buffer" + ", "  
-                    buffer_list.append(input_port["variable_name"])
                 else:
                     result += input_port["variable_name"] + ", "
         # for custom_param
@@ -149,7 +164,7 @@ def shareCodeParmInputListGenerator(jsonObj):
                 # param in "geometryvopoutput1" are all buffer data
                 # we don't won't duplicate param
                 # only add the param if not in global input
-                if buffer_list.count(output_port["variable_name"]) == 0:
+                if not output_port["port_name"] in buffer_dict:
                     result += output_port["variable_name"] + "buffer" + ", "
         else:
             for output_port in output_node:
@@ -159,6 +174,7 @@ def shareCodeParmInputListGenerator(jsonObj):
 
 # Buffer malloc
 def bufferMallocGenerator(jsonObj):
+    buffer_dict = getInputBufferDict(jsonObj)
     buffer_list = []
     result = ""
     global_input = jsonObj["global_input"] 
@@ -180,7 +196,7 @@ def bufferMallocGenerator(jsonObj):
             for output_port in output_node:
                 tmpName = output_port["variable_name"] + "buffer"
                 # add buffer to list
-                if buffer_list.count(tmpName) == 0:
+                if not output_port["port_name"] in buffer_dict:
                     buffer_list.append(tmpName)
         else:
             for output_port in output_node:
@@ -252,7 +268,7 @@ replacementMap = {
 
     "BUFFER_MALLOC":bufferMallocGenerator,
     "REF_BUFFER_NAME": refBufferNameGenerator,
-    "KERNEL_PARM_INPUT_LIST", kernelParmInputListGenerator,
+    "KERNEL_PARM_INPUT_LIST": kernelParmInputListGenerator,
 
     "KERNEL_LAUNCH_ERROR_MSG":kernelLaunchErrorMsgGenerator
 }
@@ -261,16 +277,29 @@ replacementMap = {
 # ----- Kernel/Kernel Launch Code generate -----
 
 # Read in the template
-with open('./Template/CUDAKernelTemplate.h', 'r') as file :
-  filedata = file.read()
+with open('./Template/CUDAKernelTemplate_cuh.h', 'r') as file :
+  filedata_cuh = file.read()
+  
+with open('./Template/CUDAKernelTemplate_cu.h', 'r') as file :
+  filedata_cu = file.read()
 
+  
 # Replace the target string 
-for code_segment in code_segments:
+for code_segment in code_segments_cuh:
     if code_segment in replacementMap:
-        tmp_str = "#" +  code_segment + "#"
+        tmp_str = "@" +  code_segment + "@"
         target_code = replacementMap[code_segment](jsonObj)
-        filedata = filedata.replace(tmp_str, target_code)
+        filedata_cuh = filedata_cuh.replace(tmp_str, target_code)
+        
+for code_segment in code_segments_cu:
+    if code_segment in replacementMap:
+        tmp_str = "@" +  code_segment + "@"
+        target_code = replacementMap[code_segment](jsonObj)
+        filedata_cu = filedata_cu.replace(tmp_str, target_code)
 
 # Output sharecode to file
+with open('./Code/SimpleParticle.cuh', 'w') as file:
+  file.write(filedata_cuh) 
+  
 with open('./Code/SimpleParticle.cu', 'w') as file:
-  file.write(filedata) 
+  file.write(filedata_cu) 

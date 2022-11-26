@@ -12,7 +12,7 @@ jsonObj = json.loads(json_str)
 # Parse keywords from template
 template_input = this_node.input(1)
 template = template_input.parm("/obj/geo1/solver1/d/s/share_code_file_template/content").eval()
-code_segments = re.findall('#(.+?)#', template)
+code_segments = re.findall('@(.+?)@', template)
 
 # Codeline class
 class Codeline:
@@ -240,7 +240,7 @@ with open('./Template/ShareCodeTemplate.h', 'r') as file :
 # Replace the target string 
 for code_segment in code_segments:
     if code_segment in replacementMap:
-        tmp_str = "#" +  code_segment + "#"
+        tmp_str = "@" +  code_segment + "@"
         target_code = replacementMap[code_segment](jsonObj)
         filedata = filedata.replace(tmp_str, target_code)
 

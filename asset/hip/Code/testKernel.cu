@@ -36,33 +36,31 @@ void CodeGenerator::CUDA::particle_advect (
 {
     // Buffer malloc
     geo1_solver1_d_s_particle_advect_geometryvopglobal1_Pbuffer->malloc();
-geo1_solver1_d_s_particle_advect_geometryvopglobal1_Pbuffer->loadHostToDevice();
+    geo1_solver1_d_s_particle_advect_geometryvopglobal1_Pbuffer->loadHostToDevice();
 
-geo1_solver1_d_s_particle_advect_geometryvopglobal1_vbuffer->malloc();
-geo1_solver1_d_s_particle_advect_geometryvopglobal1_vbuffer->loadHostToDevice();
+    geo1_solver1_d_s_particle_advect_geometryvopglobal1_vbuffer->malloc();
+    geo1_solver1_d_s_particle_advect_geometryvopglobal1_vbuffer->loadHostToDevice();
 
-__geo1_solver1_d_s_particle_advect_add2_sum_debug_buffer->malloc();
-__geo1_solver1_d_s_particle_advect_add2_sum_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_particle_advect_add2_sum_debug_buffer->malloc();
+    __geo1_solver1_d_s_particle_advect_add2_sum_debug_buffer->loadHostToDevice();
 
-__geo1_solver1_d_s_particle_advect_multiply2_product_debug_buffer->malloc();
-__geo1_solver1_d_s_particle_advect_multiply2_product_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_particle_advect_multiply2_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_particle_advect_multiply2_product_debug_buffer->loadHostToDevice();
 
-__geo1_solver1_d_s_particle_advect_add1_sum_debug_buffer->malloc();
-__geo1_solver1_d_s_particle_advect_add1_sum_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_particle_advect_add1_sum_debug_buffer->malloc();
+    __geo1_solver1_d_s_particle_advect_add1_sum_debug_buffer->loadHostToDevice();
 
-__geo1_solver1_d_s_particle_advect_multiply1_product_debug_buffer->malloc();
-__geo1_solver1_d_s_particle_advect_multiply1_product_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_particle_advect_multiply1_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_particle_advect_multiply1_product_debug_buffer->loadHostToDevice();
 
-__geo1_solver1_d_s_particle_advect_fit1_shift_debug_buffer->malloc();
-__geo1_solver1_d_s_particle_advect_fit1_shift_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_particle_advect_fit1_shift_debug_buffer->malloc();
+    __geo1_solver1_d_s_particle_advect_fit1_shift_debug_buffer->loadHostToDevice();
 
-__geo1_solver1_d_s_particle_advect_multiply3_product_debug_buffer->malloc();
-__geo1_solver1_d_s_particle_advect_multiply3_product_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_particle_advect_multiply3_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_particle_advect_multiply3_product_debug_buffer->loadHostToDevice();
 
-geo1_solver1_d_s_particle_advect_geometryvopoutput1_Pbuffer->malloc();
-geo1_solver1_d_s_particle_advect_geometryvopoutput1_Pbuffer->loadHostToDevice();
-
-
+    geo1_solver1_d_s_particle_advect_geometryvopoutput1_Pbuffer->malloc();
+    geo1_solver1_d_s_particle_advect_geometryvopoutput1_Pbuffer->loadHostToDevice();
 
     // Compute threads num
     int numOfThreads = Pbuffer->getSize();
