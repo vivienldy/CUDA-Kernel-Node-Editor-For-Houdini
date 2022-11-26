@@ -20,7 +20,7 @@
     "kernel_launch_name": "particle_advect",
     "kernel_name": "particle_advect",
     "func_name":"particle_advect",
-    "error msg": "simpleparticle advect error",
+    "error_msg": "simpleparticle advect error",
     "ref_buffer_name": "P",
     "global_input":{
         "geometryvopglobal1":[
