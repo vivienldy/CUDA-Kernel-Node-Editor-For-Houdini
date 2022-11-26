@@ -25,6 +25,20 @@ class Codeline:
         else:
             return ""
 
+# ----- Common ------
+def getInputBufferDict(jsonObj):
+    buffer_dict = {}
+   
+    global_input = jsonObj["global_input"] 
+    for input_node_key in global_input:
+        input_node = global_input[input_node_key]
+        
+        if input_node_key == "geometryvopglobal1":
+            for input_port in input_node:
+                if input_port["is_buffer"] == "True":
+                    buffer_dict[input_port["port_name"]] = input_port["variable_name"]
+    return buffer_dict
+
 # ----- Method Generators -----
 
 # Add
@@ -71,10 +85,16 @@ def generalGenerator(node):
     
     cd.right += node["method_name"] + "("
     for port in node["input"]:
-        if node["input"].index(port) == input_len -1:
-            cd.right += port["local_input_name"]
+        if not port["local_input_name"] == "CG_NONE":
+            if node["input"].index(port) == input_len -1:
+                cd.right += port["local_input_name"]
+            else:
+                cd.right += port["local_input_name"] + ", "
         else:
-            cd.right += port["local_input_name"] + ", "
+            if node["input"].index(port) == input_len -1:
+                cd.right += port["data_type"] + "(" + port["default_value"] + ")"
+            else:
+                cd.right += port["data_type"] + "(" + port["default_value"] + ")" + ", "
     cd.right += ")"
     for port in node["output"]:
         cd.left  = port["data_type"] + " " + port["local_output_name"]
@@ -96,7 +116,7 @@ def funcNameGenerator(jsonObj):
 
 # Parm list
 def ParmListGenerator(jsonObj):
-    buffer_list = []
+    buffer_dict = getInputBufferDict(jsonObj)
     result = ""
     global_input = jsonObj["global_input"] 
     for input_node_key in global_input:
@@ -107,7 +127,6 @@ def ParmListGenerator(jsonObj):
                 # check buffer type
                 if input_port["is_buffer"] == "True":
                     result += input_port["data_type"] + "* " + input_port["variable_name"] + "buffer" + ", "  #i.e. glm::vec3* posBuffer,
-                    buffer_list.append(input_port["variable_name"])
                 else:
                     result += input_port["data_type"] + " " + input_port["variable_name"] + ", "  #i.e. float dt,
         # for custom_param
@@ -124,7 +143,7 @@ def ParmListGenerator(jsonObj):
                 # param in "geometryvopoutput1" are all buffer data
                 # we don't won't duplicate param
                 # only add the param if not in global input
-                if buffer_list.count(output_port["variable_name"]) == 0:
+                if not output_port["port_name"] in buffer_dict:
                     result += output_port["data_type"] + "* " + output_port["variable_name"] + "buffer" + ", "
         else:
             for output_port in output_node:
@@ -170,7 +189,8 @@ def computeGraphGenerator(jsonObj):
 # Write back
 def writeBackGenerator(jsonObj):
     result = ""
-    
+    buffer_dict = getInputBufferDict(jsonObj)
+
     global_output = jsonObj["global_output"]
     for output_node_key in global_output:
         output_node = global_output[output_node_key]
@@ -180,9 +200,11 @@ def writeBackGenerator(jsonObj):
                 cd.left = output_port["data_type"] + " " + "global_output_" + output_port["variable_name"] # i.e., vec3 global_output_p
                 cd.right = output_port["connection"]# i.e., add
                 result += cd.toCode()
-                
-                cd.left = output_port["variable_name"] + "buffer[idx]" # i.e., pbuffer[idx]
-                cd.right = "global_output_" + output_port["variable_name"] # i.e., global_output_p
+                if output_port["port_name"] in buffer_dict:
+                    cd.left = buffer_dict[output_port["port_name"]] + "buffer[idx]"
+                else:
+                    cd.left = output_port["variable_name"] + "buffer[idx]"
+                cd.right = "global_output_" + output_port["variable_name"] 
                 result += cd.toCode()
                 result += "\n"
         else:
