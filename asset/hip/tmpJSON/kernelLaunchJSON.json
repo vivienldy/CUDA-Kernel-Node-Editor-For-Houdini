@@ -44,56 +44,6 @@
 
         ]
     },
-    "compute_graph":{
-        "multiply1":{
-            "method_name": "multiply",
-            "input":[
-                {
-                    "local_input_name": "v"
-                },
-                {
-                    "local_input_name": "dt"
-                }
-            ],
-            "output":[
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"product1"
-                }
-            ]
-        },
-        "add1":{
-            "method_name": "add",
-            "input":[
-                {
-                    "local_input_name": "p"
-                },
-                {
-                    "local_input_name":"product1"
-                }
-            ],
-            "output":[
-                {
-                    "data_type":"glm::vec3",
-                    "local_output_name":"sum1"
-                }
-            ]
-        },
-        "turbnoise1":{
-            "method_name": "turbnoise",
-            "input":[
-                {
-                    "local_input_name": "p"
-                }
-            ],
-            "output":[
-                {
-                    "data_type": "glm::vec3",
-                    "local_output_name": "noise"
-                }
-            ]
-        }
-    },
     "global_output":{
         "geometryvopoutput1":[
             {
