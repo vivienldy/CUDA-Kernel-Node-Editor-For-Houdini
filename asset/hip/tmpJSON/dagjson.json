@@ -22,17 +22,20 @@
             {
                 "is_buffer":"True",
                 "data_type":"glm::vec3",
-                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_P"
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_P",
+                "port_name": "P"
             },
             {
                 "is_buffer":"True",
                 "data_type":"glm::vec3",
-                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_v"
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_v",
+                "port_name":"v"
             },
             {
                 "is_buffer":"False",
                 "data_type":"float",
-                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_TimeInc"
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_TimeInc",
+                "port_name":"TimeInc"
             }
         ]
     },
@@ -351,7 +354,8 @@
             {
                 "connection":"geo1_solver1_d_s_pointvop2__DEBUG_add2_sum",
                 "data_type":"glm::vec3",
-                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_P"
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopoutput1_P",
+                "port_name":"P"
             }
         ]
     }
