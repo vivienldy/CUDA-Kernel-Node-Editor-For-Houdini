@@ -1,0 +1,74 @@
+{
+    "TaskInfo":{
+        "StartFrame": 0,
+        "EndFrame":100,
+        "FPS":24,
+        "BlockSize":128,
+        "proj_name": "SimpleParticle",
+        "kernel_launch_name": "particle_advect",
+        "kernel_name": "particle_advect",
+        "func_name":"particle_advect",
+        "error msg": "simpleparticle advect error",
+        "BufferList":[
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "p",
+                "filename": "../userInputData/posRawBufferData.txt",
+                "value": []
+            },
+            {
+                "is_buffer": "True",
+                "type": "glm::vec3",
+                "variable_name": "v",
+                "filename": "None",
+                "value": [0, 0, 0]
+            }
+        ]
+    },
+    "OperatorList":{
+        "Operator":{
+            "Parameters":[
+                {
+                    "is_buffer": "False",
+                    "type": "int",
+                    "variable_name": "geo1_solver1_d_s_pointvop2__DEBUG_turb_turb",
+                    "value": [3]
+                },
+                {
+                    "is_buffer": "False",
+                    "type": "float",
+                    "variable_name": "geo1_solver1_d_s_pointvop2__DEBUG_amp_amp",
+                    "value": [3.0]
+                },
+                {
+                    "is_buffer": "False",
+                    "type": "glm::vec3",
+                    "variable_name": "geo1_solver1_d_s_pointvop2__DEBUG_freq_freq",
+                    "value": [1.0, 2.0, 1.0]
+                },
+                {
+                    "is_buffer": "True",
+                    "type": "glm::vec3",
+                    "variable_name": "__geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer",
+                    "value": [0]
+                },
+                {
+                    "is_buffer": "True",
+                    "type": "glm::vec3",
+                    "variable_name": "multiply2_product_debug",
+                    "value": [0]
+                },
+                {
+                    "is_buffer": "True",
+                    "type": "glm::vec3",
+                    "variable_name": "add1_sum_debug",
+                    "value": [0]
+                }
+            ],
+            "DAGJson":{
+
+            }
+        }
+    }
+}
