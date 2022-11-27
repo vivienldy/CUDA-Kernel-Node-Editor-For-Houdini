@@ -1,7 +1,4 @@
-// 实现 CodeGenerator::ParticleAdvect() // CPU FORLOOP
-
 #include "SimpleParticle.h"
-
 #include "CGField.h"
 
 void CodeGenerator::ParticleAdvect(
