@@ -1,4 +1,4 @@
-#include "@PROJ_NAME@.h"
+#include "SimpleParticle.h"
 
 int main() 
 {
@@ -9,17 +9,20 @@ int main()
     // auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer =
     //     dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(filename));
 
-    @GLOBAL_INIT_LOAD@
+    auto pbuffer = dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile("../userInputData/posRawBufferData.txt")); 
+
 
     // int numPoints = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->getSize();
-    int numPoints = @GLOBAL_GET_SIZE@;
+    int numPoints = pbuffer->getSize(); 
+;
 
     // dynamically create and initialize vbuffer
     // auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer = new CGBuffer<glm::vec3>(
     //     "vel",
     //     numPoints,
     //     glm::vec3(0.f));
-    @GLOBAL_INIT@
+    auto vbuffer = new CGBuffer<glm::vec3>("v", numPoints, glm::vec3(0, 0, 0)); 
+
 
 
     // ===== create vop user custom parameter
@@ -53,14 +56,24 @@ int main()
     //     "__geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer",
     //     numPoints,
     //     glm::vec3(0.f));
-    @CUSTOM_INIT@
+    int geo1_solver1_d_s_pointvop2__DEBUG_turb_turb = 3; 
+	float geo1_solver1_d_s_pointvop2__DEBUG_amp_amp = 3.0; 
+	glm::vec3 geo1_solver1_d_s_pointvop2__DEBUG_freq_freq = glm::vec3(1.0, 2.0, 1.0); 
+	auto __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer_buffer = new CGBuffer<glm::vec3>("__geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer", numPoints, glm::vec3(0)); 
+	auto multiply2_product_debug_buffer = new CGBuffer<glm::vec3>("multiply2_product_debug", numPoints, glm::vec3(0)); 
+	auto add1_sum_debug_buffer = new CGBuffer<glm::vec3>("add1_sum_debug", numPoints, glm::vec3(0)); 
+	
 
     // ===== load from another json???
     // int startFrame = 0;
     // int endFrame = 500;
     // float FPS = 24.f;
     // int blockSize = 128;
-    @PARAM_INIT@
+    int startFrame = 0; 
+	int endFrame = 100; 
+	float FPS = 24; 
+	int blockSize = 128; 
+	
 
     float TimeInc = 1.0 / FPS;
 
@@ -70,16 +83,18 @@ int main()
         float Frame = i;
 
 #if CPU_VERSION
-        CodeGenerator::@FUNC_NAME@(
-            @FUNC_PARAM_LIST@);
+        CodeGenerator::particle_advect(
+            geo1_solver1_d_s_pointvop2__DEBUG_turb_turb, geo1_solver1_d_s_pointvop2__DEBUG_amp_amp, geo1_solver1_d_s_pointvop2__DEBUG_freq_freq, pbuffer, vbuffer, __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer_buffer, multiply2_product_debug_buffer, add1_sum_debug_buffer);
 
 #elif GPU_VERSION
-        CodeGenerator::CUDA::@FUNC_NAME@(
-            @FUNC_PARAM_LIST@,
+        CodeGenerator::CUDA::particle_advect(
+            geo1_solver1_d_s_pointvop2__DEBUG_turb_turb, geo1_solver1_d_s_pointvop2__DEBUG_amp_amp, geo1_solver1_d_s_pointvop2__DEBUG_freq_freq, pbuffer, vbuffer, __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer_buffer, multiply2_product_debug_buffer, add1_sum_debug_buffer,
             blockSize);
         cudaDeviceSynchronize();
         //geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->loadDeviceToHost();
-        @GLOABL_LOAD_TO_HOST@
+        pbuffer->loadDeviceToHost(); 
+		vbuffer->loadDeviceToHost(); 
+		
 #endif
 
         // save pos buffer as obj file
@@ -95,6 +110,7 @@ int main()
         outputObjFilePath.append(".obj");
 
         //geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->outputObj(outputObjFilePath);
-        @GLOBAL_LOAD_TO_OBJ@
+        pbuffer->outputObj(outputObjFilePath); 
+
     }
 }
