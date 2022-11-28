@@ -1,0 +1,93 @@
+{
+    "TaskInfo":{
+        "StartFrame":0,
+        "EndFrame":100,
+        "FPS":24,
+        "BlockSize":128,
+        "UseGPU": 1,
+        "BufferMap":[
+            {
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_P",
+                "filename":"../userInputData/posRawBufferData.txt",
+                "data_type":"CG_NONE",
+                "value":"CG_NONE"
+            },
+            {
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_v",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            },
+            {
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_fit1_shift_debug",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            },
+            {
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            },
+            {
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            },
+            {
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            },
+            {
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            },
+            {
+                "variable_name":"__geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug",
+                "filename":"CG_NONE",
+                "data_type":"glm::vec3",
+                "value":"0.f, 0.f, 0.f"
+            }
+        ],
+        "ParameterMap":[
+            {
+                "type":"int",
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_turb_turb",
+                "value":"3.f"
+            },
+            {
+                "type":"float",
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_amp_amp",
+                "value":"1.f"
+            },
+            {
+                "type":"glm::vec3",
+                "variable_name":"geo1_solver1_d_s_pointvop2__DEBUG_freq_freq",
+                "value":"1.f, 2.f, 1.f"
+            }            
+        ]
+    },
+    "OperatorList":{
+        "Operator":{
+            "Parameters":[
+                "geo1_solver1_d_s_pointvop2__DEBUG_turb_turb",
+                "geo1_solver1_d_s_pointvop2__DEBUG_amp_amp",
+                "geo1_solver1_d_s_pointvop2__DEBUG_freq_freq",
+                "__geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer",
+                "multiply2_product_debug"
+            ],
+            "DAGJson":{
+            },
+            "KernelLaunchJson":{
+            },
+            "CPUJson":{      
+            }
+        }
+    }
+}
