@@ -1,23 +1,6 @@
 import re
 import json
 
-this_node = hou.pwd()
-
-# Load dag_son
-geo = this_node.geometry()
-json_str = geo.findGlobalAttrib("kernel_launch_json").strings()
-json_str = json_str[0]
-jsonObj = json.loads(json_str)
-
-# Parse keywords from template
-template_input_cuh = this_node.input(1)
-template_cuh = template_input_cuh.parm("/obj/geo1/solver1/d/s/kernel_cuh_template/content").eval()
-code_segments_cuh = re.findall('@(.+?)@', template_cuh)
-
-template_input_cu = this_node.input(2)
-template_cu = template_input_cu.parm("/obj/geo1/solver1/d/s/kernel_cu_template/content").eval()
-code_segments_cu = re.findall('@(.+?)@', template_cu)
-
 # Codeline class
 class Codeline:
     def __init__(self):
@@ -273,8 +256,24 @@ replacementMap = {
     "KERNEL_LAUNCH_ERROR_MSG":kernelLaunchErrorMsgGenerator
 }
 
-
 # ----- Kernel/Kernel Launch Code generate -----
+
+this_node = hou.pwd()
+
+# Load dag_son
+geo = this_node.geometry()
+json_str = geo.findGlobalAttrib("kernel_launch_json").strings()
+json_str = json_str[0]
+jsonObj = json.loads(json_str)
+
+# Parse keywords from template
+template_input_cuh = this_node.input(1)
+template_cuh = template_input_cuh.parm("/obj/geo1/solver1/d/s/kernel_cuh_template/content").eval()
+code_segments_cuh = re.findall('@(.+?)@', template_cuh)
+
+template_input_cu = this_node.input(2)
+template_cu = template_input_cu.parm("/obj/geo1/solver1/d/s/kernel_cu_template/content").eval()
+code_segments_cu = re.findall('@(.+?)@', template_cu)
 
 # Read in the template
 with open('./Template/CUDAKernelTemplate_cuh.h', 'r') as file :
@@ -298,8 +297,10 @@ for code_segment in code_segments_cu:
         filedata_cu = filedata_cu.replace(tmp_str, target_code)
 
 # Output sharecode to file
-with open('./Code/SimpleParticle.cuh', 'w') as file:
+file_name_cuh = "./Code/" + fileNameGenerator(jsonObj=jsonObj) + ".cuh"
+with open(file_name_cuh, 'w') as file:
   file.write(filedata_cuh) 
-  
-with open('./Code/SimpleParticle.cu', 'w') as file:
+
+file_name_cu = "./Code/" + fileNameGenerator(jsonObj=jsonObj) + ".cu"
+with open(file_name_cu, 'w') as file:
   file.write(filedata_cu) 
