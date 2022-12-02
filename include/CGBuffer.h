@@ -40,7 +40,7 @@ public:
 
 	}
 
-	virtual uint32_t TypeSize() = 0;
+	virtual uint32_t typeSize() = 0;
 	//virtual void setDevicePtr(void* rawPtr) = 0;
 
 	void* getRawPtr() { return m_rawPtr; }
@@ -55,7 +55,13 @@ public:
 	}
 
 	void reallocationDevice(int appendSize) {
+		void* devicePtr;
+		cudaMalloc((void**)&devicePtr, (m_bufferSize + appendSize) * typeSize());
+		cudaMemcpy(devicePtr, m_devicePtr, m_bufferSize * typeSize(), cudaMemcpyDeviceToDevice);
 
+		cudaFree(m_devicePtr);
+		m_devicePtr = devicePtr;
+		m_bufferSize += appendSize;
 	}
 
 	uint32_t getSize() {
@@ -104,7 +110,7 @@ public:
 		m_rawPtr = &m_data;
 	}
 
-	uint32_t TypeSize() { return sizeof(T); }
+	uint32_t typeSize() { return sizeof(T); }
 
 	void addVlaue(T value) {
 		m_data.push_back(value);
