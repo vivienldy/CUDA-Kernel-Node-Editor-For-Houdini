@@ -13,17 +13,16 @@
 
 #include <glm/glm.hpp>
 #include <device_launch_parameters.h>
-
-enum DataType {
-	VEC3,
-	FLOAT
-};
+#include <cuda_runtime.h>
 
 class CGBufferBase {
 protected:
 	uint32_t m_bufferSize;
 	std::string bufferNmae;
 	bool isMalloc;
+
+	void* m_rawPtr;
+	void* m_devicePtr;
 
 public:
 	CGBufferBase()
@@ -36,8 +35,26 @@ public:
 		: CGBufferBase(size, "Autonomy") {}
 
 	CGBufferBase(int size, std::string name)
-		: m_bufferSize(size), bufferNmae(name), isMalloc(false)
+		: m_bufferSize(size), bufferNmae(name), isMalloc(false), m_rawPtr(nullptr), m_devicePtr(nullptr)
 	{
+
+	}
+
+	virtual uint32_t TypeSize() = 0;
+	//virtual void setDevicePtr(void* rawPtr) = 0;
+
+	void* getRawPtr() { return m_rawPtr; }
+
+	void reallocationHost(int appendSize) {
+
+		std::vector<glm::vec3> vec(appendSize, glm::vec3(2.f, 3.f, 4.f));
+		std::vector<glm::vec3>* p = ((std::vector<glm::vec3>*)m_rawPtr);
+		p->insert(p->end(), vec.begin(), vec.end());
+
+		m_bufferSize += appendSize;
+	}
+
+	void reallocationDevice(int appendSize) {
 
 	}
 
@@ -53,11 +70,11 @@ public:
 		return isMalloc;
 	}
 
-	std::string getName(){
+	std::string getName() {
 		return bufferNmae;
 	}
 
-	void setName(std::string name){
+	void setName(std::string name) {
 		bufferNmae = name;
 	}
 
@@ -68,27 +85,26 @@ template<class T>
 class CGBuffer : public CGBufferBase {
 private:
 	std::vector<T> m_data;
-	T* m_devicePtr;
 
 public:
 	CGBuffer()
-		: CGBufferBase(),
-		m_devicePtr(nullptr)
+		: CGBufferBase()
 	{
-
 	}
 
 	CGBuffer(int size, T value)
-		: CGBufferBase(size),
-		m_data(std::vector<T>(size, value)), m_devicePtr(nullptr)
+		: CGBuffer("", size, value)
 	{
 	}
 
 	CGBuffer(std::string name, int size, T value)
 		: CGBufferBase(size, name),
-		m_data(std::vector<T>(size, value)), m_devicePtr(nullptr)
+		m_data(std::vector<T>(size, value))
 	{
+		m_rawPtr = &m_data;
 	}
+
+	uint32_t TypeSize() { return sizeof(T); }
 
 	void addVlaue(T value) {
 		m_data.push_back(value);
@@ -99,7 +115,7 @@ public:
 		std::vector<T> vec = object->getData();
 		m_data = std::vector<T>(vec.begin(), vec.end());
 
-		m_bufferSize = object->size();
+		m_bufferSize = object->getSize();
 
 		if (object->hasMemory()) {
 			this->malloc();
@@ -116,7 +132,7 @@ public:
 	}
 
 	T* getRawData() {
-		return m_data.data;
+		return m_data.data();
 	}
 
 	std::vector<T> getData() {
@@ -128,7 +144,7 @@ public:
 	}
 
 	T* getDevicePointer() {
-		return m_devicePtr;
+		return (T*)m_devicePtr;
 	}
 
 	void setSize(int size) {
@@ -139,6 +155,9 @@ public:
 	bool malloc() {
 		isMalloc = true;
 		cudaMalloc((void**)&m_devicePtr, m_bufferSize * sizeof(T));
+
+		//m_rawPtr = m_devicePtr;
+
 		return true;
 	}
 
@@ -153,11 +172,11 @@ public:
 		return true;
 	}
 
-	bool loadFromDevice(T* devicePtr, int N = -1, bool toHost=true) {
+	bool loadFromDevice(T* devicePtr, int N = -1, bool toHost = true) {
 		if (N == -1) {
 			N = m_bufferSize;
 		}
-		N = min(N, m_bufferSize);
+		N = std::min(N, (int)m_bufferSize);
 
 		checkMalloc();
 		cudaMemcpy(m_devicePtr, devicePtr, N * sizeof(T), cudaMemcpyDeviceToDevice);
