@@ -18,6 +18,8 @@
 class CGBufferBase {
 protected:
 	uint32_t m_bufferSize;
+	uint32_t m_appendSize;
+
 	std::string bufferNmae;
 	bool isMalloc;
 
@@ -25,14 +27,15 @@ protected:
 	void* m_devicePtr;
 
 public:
+
 	CGBufferBase()
-		: CGBufferBase(0, "Autonomy")
+		: CGBufferBase(0, "Autonomy: " + std::to_string(0))
 	{
 
 	}
 
 	CGBufferBase(int size)
-		: CGBufferBase(size, "Autonomy") {}
+		: CGBufferBase(size, "Autonomy: " + std::to_string(0)) {}
 
 	CGBufferBase(int size, std::string name)
 		: m_bufferSize(size), bufferNmae(name), isMalloc(false), m_rawPtr(nullptr), m_devicePtr(nullptr)
@@ -47,10 +50,11 @@ public:
 
 	void reallocationHost(int appendSize) {
 
-		std::vector<glm::vec3> vec(appendSize, glm::vec3(2.f, 3.f, 4.f));
+		std::vector<glm::vec3> vec(appendSize, glm::vec3(0.f));
 		std::vector<glm::vec3>* p = ((std::vector<glm::vec3>*)m_rawPtr);
 		p->insert(p->end(), vec.begin(), vec.end());
 
+		m_appendSize = appendSize;
 		m_bufferSize += appendSize;
 	}
 
@@ -60,12 +64,20 @@ public:
 		cudaMemcpy(devicePtr, m_devicePtr, m_bufferSize * typeSize(), cudaMemcpyDeviceToDevice);
 
 		cudaFree(m_devicePtr);
+
 		m_devicePtr = devicePtr;
+		m_appendSize = appendSize;
 		m_bufferSize += appendSize;
 	}
 
 	uint32_t getSize() {
 		return m_bufferSize;
+	}
+
+	void* getDevicePtr() { return m_devicePtr; }
+
+	uint32_t getAppendSize() {
+		return m_appendSize;
 	}
 
 	void setSize(uint32_t size) {
@@ -287,6 +299,8 @@ CGBufferBase* CGBuffer<T>::loadFromFile(std::string filename) {
 
 	return instance;
 }
+
+//int CGBufferBase::id = 0;
 
 ///**
 //* C main function.
