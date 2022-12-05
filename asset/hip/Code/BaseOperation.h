@@ -36,7 +36,7 @@ namespace CodeGenerator
                 return glm::cross(a, b);
             }
 
-            __host__ __device__ inline void	vectofloat(glm::vec3 v, float& x, float& y, float& z) {
+            __host__ __device__ inline void	vectofloat(glm::vec3 v, float* x, float* y, float* z) {
 	            x = v[0]; y = v[1]; z = v[2]; 
             }
 

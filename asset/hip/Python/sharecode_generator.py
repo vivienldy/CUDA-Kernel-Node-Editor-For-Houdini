@@ -114,10 +114,16 @@ def constantMethodGenerator(node):
     
 # General Case 
 def generalGenerator(node):
+    result = ""
+    output_len = len(node["output"])
+    if output_len = len(node["output"]) > 1:
+        for port in node["output"]:
+            result += port["data_type"] + " " + port["local_output_name"] + ";\n"
     cd = Codeline()
     input_len = len(node["input"])
     
     cd.right += node["method_name"] + "("
+
     for port in node["input"]:
         if not port["local_input_name"] == "CG_NONE":
             if node["input"].index(port) == input_len -1:
@@ -129,10 +135,23 @@ def generalGenerator(node):
                 cd.right += port["data_type"] + "(" + port["default_value"] + ")"
             else:
                 cd.right += port["data_type"] + "(" + port["default_value"] + ")" + ", "
-    cd.right += ")"
-    for port in node["output"]:
-        cd.left  = port["data_type"] + " " + port["local_output_name"]
-    return cd.toCode() 
+
+    if output_len = len(node["output"]) > 1:
+        cd.right += ", "
+        for port in node["output"]:
+            if node["output"].index(port) == output_len - 1:
+                cd.right += "&" + port["local_output_name"]
+            else:
+                cd.right += "&" + port["local_output_name"] + ", "
+        cd.right += ")"
+        result += cd.right + ";\n"
+    else:
+        cd.right += ")"
+        for port in node["output"]:
+            cd.left  = port["data_type"] + " " + port["local_output_name"]
+        result += cd.toCode()
+    
+    return result
 
 # ----- Method Map -----
 customCodeGeneratorMap = {
@@ -144,7 +163,6 @@ customCodeGeneratorMap = {
     "complement":complementMethodGenerator
     }
     
-
 # ----- Code Segment Generators -----
 
 # Fucntion name
