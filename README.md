@@ -33,10 +33,15 @@ Houdini is only a front end application. as long as the application can generate
 Now we are only generating CUDA code base on the information we get from the JSON files. With all the information needed stores in the JSON files, we can generate code for multiple platform later.
 
 # Code Generator Pipeline
-## Creat Houdini VOP Node
-TODO: Dongying
-## VOP to JSON
+## User Created Houdini VOP Node
+User will create various effect with Houdini VOP Nodes.
+The VOP nodes which user created is the core of our code generator, which we will auto-generate what we called CPU-GPU Generic Code from.
+
+## VOP to JSON Files
+```Input:``` User created Houdini VOP nodes.
+```Output:``` JSON files for auto code generation.
 The outputs of this stage are a series of JSON files.
+In this step, we will translate the Houdini VOP Node to directed acyclic graph(DAG) and save all the calculation information needed to several JSON files.
 
 The first step in this phase is to work with the developer in the next phase to determine the format of the JSON file and the required information based on the reference code (here we refer to Houdini's VEX code). For example, in order to parse the `add` node in our VOP network into the following line of code, the information that must be included in the JSON is: node name, operation, input list, output list, as well as the connections to inputs and outpus.
 ```
