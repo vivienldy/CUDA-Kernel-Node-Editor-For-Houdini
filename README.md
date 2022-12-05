@@ -68,14 +68,6 @@ On the CPU, we will use a for loop to iterate over each particle and update thei
 
 Although the way of traversing the particles is different, the code used to calculate its new position is the same. This line of code is an example of CPU-GPU Generic code.
 
-
-
-
-### CPU Code Generation
-
-### CUDA Code Generation
-
-
 ## Read in Houdini data (CGBuffer)
 TODO: Yuchia
 ## Code to OBJ
