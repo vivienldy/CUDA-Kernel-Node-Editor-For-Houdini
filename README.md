@@ -12,7 +12,12 @@ TODO: Dongying/Wenqing/Yuchia
 ## Creat Houdini VOP Node
 TODO: Dongying
 ## VOP to JSON
-TODO: Dongying/Wenqing
+The outputs of this stage are a series of JSON files.
+
+The first step in this phase is to work with the developer in the next phase to determine the format of the JSON file and the required information based on the reference code (here we refer to Houdini's VEX code). For example, in order to parse the `add` node in our VOP network into the following line of code, the information that must be included in the JSON is: node name, operation, input list, output list, as well as the connections to inputs and outpus.
+```
+float sum = input1 + input2;
+```
 ## JSON to Code
 
 The JSON to Code phase has two main inputs. One is the JSON file from the previous phase, which contains information about each node in the VOP network and their connections. The other is a template file that defines the main components of the target code snippet. The final output of this stage is all the files we need to generate the solution, including the CPU/GPU header/source files and our generic code files.
