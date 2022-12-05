@@ -54,7 +54,41 @@ def addMethodGenerator(node):
     for port in node["output"]:
         cd.left  = port["data_type"] + " " + port["local_output_name"]
     return cd.toCode()
-    
+
+# Subtract
+def subtractMethodGenerator(node):
+    cd = Codeline()
+    input_len = len(node["input"])
+    for port in node["input"]:
+        if node["input"].index(port) == input_len - 1:
+            cd.right += port["local_input_name"]
+        else:
+            cd.right += port["local_input_name"] + " - "
+
+    for port in node["output"]:
+        cd.left  = port["data_type"] + " " + port["local_output_name"]
+    return cd.toCode()
+
+# Negate
+def negateMethodGenerator(node):
+    cd = Codeline()
+    for port in node["input"]:
+        cd.right = " - " + port["local_input_name"] 
+
+    for port in node["output"]:
+        cd.left  = port["data_type"] + " " + port["local_output_name"]
+    return cd.toCode()
+
+# Complement
+def complementMethodGenerator(node):
+    cd = Codeline()
+    for port in node["input"]:
+        cd.right = " 1 - " + port["local_input_name"] 
+
+    for port in node["output"]:
+        cd.left  = port["data_type"] + " " + port["local_output_name"]
+    return cd.toCode()
+
 # Multiply
 def multiplyMethodGenerator(node):
     cd = Codeline()
@@ -104,7 +138,10 @@ def generalGenerator(node):
 customCodeGeneratorMap = {
     "multiply":multiplyMethodGenerator,
     "add":addMethodGenerator,
-    "constant":constantMethodGenerator
+    "subtract":subtractMethodGenerator,
+    "constant":constantMethodGenerator,
+    "negate":negateMethodGenerator,
+    "complement":complementMethodGenerator
     }
     
 
