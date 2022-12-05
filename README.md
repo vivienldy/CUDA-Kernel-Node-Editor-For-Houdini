@@ -4,9 +4,33 @@
 
 by Dongying Liu, Wenqing Wang, and Yuchia Shen.
 
-# Overview
-TODO: Dongying/Wenqing/Yuchia
+# Project Overview
+## **Goals**
+Provide an cuda kernel node editor for Houdini. 
+Users can create various types of effects based on Houdini VOP node, and our tool can auto-generate both CPU (for debugging) and CUDA code based on the VOP node.
 
+## **Target Users** 
+Technical Artist
+Even if the technical artist or other users who is not familiar with those holy graphics APIs can do CUDA development with our tool.
+The only thing our user need to worry about is how to create effect with Houdini VOP node. It doesn't matter to them how the algorithem will actually generate backend.
+
+## **Why Houdini**
+Among all the cool game engines which also has node base editor like Unreal and Unity, why we choose Houdini?
+
+```Visual Debugging System``` 
+For our target users, Houdini has a powerful visual debug system, which means we can immediatly see the result from the scene view window whenever we make changes. And this perticularly benifit our users, who will create and visualize the effects with Houdini VOP Node.
+Except the realtime result. Houdini has this spreadsheet where we can check attributes for every points primitive of the geometry like position, color, normal and even more custom attributes to see if the value reaches our expectations.
+
+```Powerful Python API``` 
+For us the code generator development, Houdini has a powerful python API. We can write python with python nodes in Houdini and see real time result with our code wrote. And what's more, with the print node of the VOP node, we can easily generate ground truth for our code generator to debug for our code generator.
+
+## **Is This Project Highly Dependence on Houdini?**
+The answer is... No!
+We designed our code generator decoupling with JSON, which means every steps of our code generator will communicate with their next step with JSON.
+Houdini is only a front end application. as long as the application can generate the same formatted JSON(which the format is designed by us), we can use the follow up python program to generate code immediatly. For more information, please checkout the next part: Code Generator Pipeline.
+
+## **What's next? Future Potential?**
+Now we are only generating CUDA code base on the information we get from the JSON files. With all the information needed stores in the JSON files, we can generate code for multiple platform later.
 
 # Code Generator Pipeline
 ## Creat Houdini VOP Node
