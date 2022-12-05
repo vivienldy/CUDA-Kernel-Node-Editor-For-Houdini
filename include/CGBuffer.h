@@ -122,6 +122,61 @@ public:
 		m_rawPtr = &m_data;
 	}
 
+	void initializeFromFile(std::string filename) {
+		char* fname = (char*)filename.c_str();
+
+		std::ifstream fp_in;
+		fp_in.open(fname);
+		if (!fp_in.is_open()) {
+			std::cout << "Error reading from file - aborting!" << std::endl;
+			throw;
+		}
+
+		std::string valueType = "";
+		getline(fp_in, valueType, '|');
+
+		std::vector<float> values;
+		while (fp_in.good()) {
+			std::string line;
+			getline(fp_in, line, ',');
+			if (!line.empty()) {
+				values.push_back(std::stof(line));
+			}
+		}
+
+		int offset = 1;
+		m_data.clear();
+
+		CGBufferBase* instance;
+		if (valueType == "3f") {
+			offset = 3;
+			std::vector<glm::vec3>* vec = new std::vector<glm::vec3>();
+			for (int i = 0; i < values.size(); i += offset) {
+				vec->push_back(glm::vec3(values[i], values[i + 1], values[i + 2]));
+			}
+
+			m_rawPtr = vec;
+		}
+		else if (valueType == "1f") {
+			offset = 1;
+			std::vector<float>* vec = new std::vector<float>();
+			m_rawPtr = &vec;
+			for (int i = 0; i < values.size(); i += offset) {
+				vec->push_back(values[i]);
+			}
+
+			m_rawPtr = vec;
+		}
+
+		m_data = *(std::vector<T>*)m_rawPtr;
+		m_bufferSize = m_data.size();
+	}
+
+	void setToZero() {
+		m_data = std::vector<T>(m_bufferSize, 0.f);
+		m_rawPtr = &m_data;
+	}
+
 	uint32_t typeSize() { return sizeof(T); }
 
 	void addVlaue(T value) {
@@ -159,6 +214,7 @@ public:
 
 	void setHostData(std::vector<T>& v) {
 		m_data = std::vector<T>(v.begin(), v.end());
+		m_rawPtr = &m_data;
 	}
 
 	T* getDevicePointer() {
@@ -239,9 +295,21 @@ public:
 		std::string objContent = "g\n";
 
 		std::string type = typeid(T).name(); //struct glm::tvec3<float,0>
-		for (auto data : m_data) {
-			if (type == "struct glm::tvec3<float,0>") {
-				objContent += "v " + std::to_string(data[0]) + " " + std::to_string(data[1]) + " " + std::to_string(data[2]) + "\n";
+
+		if (type == "struct glm::tvec3<float,0>") {
+			std::vector<glm::vec3> ptr = *(std::vector<glm::vec3>*)m_rawPtr;
+
+			for (int i = 0; i < m_bufferSize; i++) {
+				glm::vec3 p = ptr[i];
+				objContent += "v " + std::to_string(p[0]) + " " + std::to_string(p[1]) + " " + std::to_string(p[2]) + "\n";
+			}
+		}
+		else if (type == "float") {
+			std::vector<float> ptr = *(std::vector<float>*)m_rawPtr;
+
+			for (int i = 0; i < m_bufferSize; i++) {
+				float p = ptr[i];
+				objContent += "v " + std::to_string(p) + "\n";
 			}
 		}
 
