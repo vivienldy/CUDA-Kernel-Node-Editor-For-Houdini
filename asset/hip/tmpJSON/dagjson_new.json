@@ -668,16 +668,13 @@
     },
     "global_output":{
         "custom_param":[
-            {
-                "connection":"geo1_volumevop1_add2_sum",
-                "data_type":"glm::vec3",
-                "variable_name":"__geo1_volumevop1_add2_sum_debug"
-            }
         ],
         "volumevopoutput1":[
             {
+                "connection":"geo1_volumevop1_add2_sum",
                 "data_type":"glm::vec3",
-                "local_output_name":"geo1_volumevop1_input2_input2"
+                "variable_name":"geo1_volumevop1_vel",
+                "port_name":"vel"
             }
         ]
     }
