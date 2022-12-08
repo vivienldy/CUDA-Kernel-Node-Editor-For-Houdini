@@ -69,10 +69,43 @@ def output_port_dataType_analyzer(raw_output_names, raw_output_datatypes, index)
     if(name.find("OpInput") != -1):
         return "struct"
     return raw_output_datatypes[index]
+
+def compare_node_input_analyzer(vop_node):
+    compare_operation_dict = {"eq" : "equal", "lt" : "less than", "gt" : "greater than", "lte": "less than or equal", "gte": "greater than or equal", "neq": "not equal"}
+    ip = Port()
+    ip.port_name = "compare_operation"
+    ip.data_type = "string"
+    ip.default_value = compare_operation_dict[vop_node.parm("cmp").eval()]
+    return ip
+"""
+{
+                    "param_name":"compare_operation",
+                    "data_type":"string",
+                    "default_value":"less than",
+                    "local_input_name":"CG_NONE"
+}
+"""
+
+def twoway_node_input_analyzer(vop_node):
+    compare_operation_dict = {0 : "use input 1 if condition true", 1 : "use input 1 if condition false"}
+    ip = Port()
+    ip.port_name = "condition_type"
+    ip.data_type = "string"
+    ip.default_value = compare_operation_dict[vop_node.parm("condtype").eval()]
+    return ip
+"""
+{
+                    "param_name":"condition_type",
+                    "data_type":"string",
+                    "default_value":"use input 1 if condition true",
+                    "local_input_name":"CG_NONE"
+}
+"""
+
             
 
 # ========= global value
-general_operation_list = ["curlnoise", "fit"]
+general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway"]
 signature_parm_suffix_dict = {"default": ["1", "2", "3"], "v":["_v1", "_v2", "_v3"], "p":["_p1", "_p2", "_p3"], "c":["_cr", "_cg", "_cb"], "n":["_n1", "_n2", "_n3"]} # uv, un, up, uc...
 
 # get the current python node
@@ -92,7 +125,7 @@ is_node_visited_list = [] # tracked the node is visited or not
 for vop_node in vop_children:
     node_path = vop_node.path().replace('/obj/','')
     node_path = node_path.replace("/", "_")
-    print("==== now creating dag node for: " + str(vop_node) + " ====")
+    print("======================================== now creating dag node for: " + str(vop_node) + " ========================================")
     dag_node = Node()
     dag_node.method_name = vop_node.type().name() 
     dag_node.node_name = vop_node.name()
@@ -121,7 +154,8 @@ for vop_node in vop_children:
                 print("    port name: " + ip.port_name)
                 print("    data type: " + ip.data_type)
                 dag_node.inputs.append(ip)
-    else: # if is general operation: curlnoise, fit save all the input param to DAG Node
+
+    else: # if is general operation: curlnoise, fit, cross save all the input param to DAG Node
         print("=== creating general operation's dag node input port list")
         input_connector_list = vop_node.inputConnectors()
         input_data_type_list = vop_node.inputDataTypes()
@@ -161,7 +195,11 @@ for vop_node in vop_children:
                 print("    port name: " + ip.port_name)
                 print("    data type: " + ip.data_type)
                 print("    default value: " + ip.default_value)
-            dag_node.inputs.append(ip)
+            dag_node.inputs.append(ip)            
+        if dag_node.method_name == "compare": # compare need one more input which is not on input port
+            dag_node.inputs.append(compare_node_input_analyzer(vop_node))
+        if dag_node.method_name == "twoway":
+            dag_node.inputs.append(twoway_node_input_analyzer(vop_node))
         
     # create dag node output port list
     if(len(vop_node.outputConnections()) != 0):
