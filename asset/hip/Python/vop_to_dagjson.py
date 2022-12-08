@@ -17,6 +17,8 @@ class Node:
         self.node_path = ""
         self.inputs = [] # list of Port
         self.outputs = [] # list of Port
+        self.raw_output_names = [] # all the output names on the node, no matter if connected
+        self.raw_output_types = [] # all the output types on the node, no matter if connected
         
 def dfs(node_id, is_node_visited_list, visit_nodes_list, dag_nodes_list):
     global node_name_id_dict
@@ -40,10 +42,70 @@ def is_buffer(port_name):
         if port_name.find("_"+name) != -1:
             return "True"
     return "False"
+
+# GPU is not friendly to double
+# for constant or default value
+# if is not int, then add "f" at last
+def number_formatter(num_str):
+    # if is decimal
+    if num_str.find(".") !=-1:
+        # if vector
+        if(num_str.find(", ") != -1):
+            new_num_str = ""
+            nums = num_str.split(", ")
+            for i in range(len(nums)):
+                num = nums[i]
+                new_num_str += num +"f"
+                if (i != (len(nums) - 1)):
+                    new_num_str += ", "
+            return new_num_str
+
+        else:
+            return num_str + "f"
+    return num_str
+
+def output_port_dataType_analyzer(raw_output_names, raw_output_datatypes, index):
+    name = raw_output_names[index]
+    if(name.find("OpInput") != -1):
+        return "struct"
+    return raw_output_datatypes[index]
+
+def compare_node_input_analyzer(vop_node):
+    compare_operation_dict = {"eq" : "equal", "lt" : "less than", "gt" : "greater than", "lte": "less than or equal", "gte": "greater than or equal", "neq": "not equal"}
+    ip = Port()
+    ip.port_name = "compare_operation"
+    ip.data_type = "string"
+    ip.default_value = compare_operation_dict[vop_node.parm("cmp").eval()]
+    return ip
+"""
+{
+                    "param_name":"compare_operation",
+                    "data_type":"string",
+                    "default_value":"less than",
+                    "local_input_name":"CG_NONE"
+}
+"""
+
+def twoway_node_input_analyzer(vop_node):
+    compare_operation_dict = {0 : "use input 1 if condition true", 1 : "use input 1 if condition false"}
+    ip = Port()
+    ip.port_name = "condition_type"
+    ip.data_type = "string"
+    ip.default_value = compare_operation_dict[vop_node.parm("condtype").eval()]
+    return ip
+"""
+{
+                    "param_name":"condition_type",
+                    "data_type":"string",
+                    "default_value":"use input 1 if condition true",
+                    "local_input_name":"CG_NONE"
+}
+"""
+
             
 
 # ========= global value
-general_operation_list = ["curlnoise", "fit"]
+general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway"]
 signature_parm_suffix_dict = {"default": ["1", "2", "3"], "v":["_v1", "_v2", "_v3"], "p":["_p1", "_p2", "_p3"], "c":["_cr", "_cg", "_cb"], "n":["_n1", "_n2", "_n3"]} # uv, un, up, uc...
 
 # get the current python node
@@ -63,13 +125,15 @@ is_node_visited_list = [] # tracked the node is visited or not
 for vop_node in vop_children:
     node_path = vop_node.path().replace('/obj/','')
     node_path = node_path.replace("/", "_")
-    print("==== now creating dag node for: " + str(vop_node) + " ====")
+    print("======================================== now creating dag node for: " + str(vop_node) + " ========================================")
     dag_node = Node()
     dag_node.method_name = vop_node.type().name() 
     dag_node.node_name = vop_node.name()
     dag_node.node_name_digit = vop_node.digitsInName()
     dag_node.id = len(dag_nodes_list)
     dag_node.node_path = node_path
+    dag_node.raw_output_names = list(vop_node.outputNames())
+    dag_node.raw_output_types = list(vop_node.outputDataTypes())
     # ==== create dag node input port list
     if dag_node.method_name not in general_operation_list: # if is base operator: add, multiply only save inputConnections to DAG Node
         if(len(vop_node.inputConnections()) != 0):
@@ -90,7 +154,8 @@ for vop_node in vop_children:
                 print("    port name: " + ip.port_name)
                 print("    data type: " + ip.data_type)
                 dag_node.inputs.append(ip)
-    else: # if is general operation: curlnoise, fit save all the input param to DAG Node
+
+    else: # if is general operation: curlnoise, fit, cross save all the input param to DAG Node
         print("=== creating general operation's dag node input port list")
         input_connector_list = vop_node.inputConnectors()
         input_data_type_list = vop_node.inputDataTypes()
@@ -121,16 +186,20 @@ for vop_node in vop_children:
                 # normally, if signature is not default, which has many data type.. need to add v1, v2, v3 / p1, p2, p3 / cr, cg, cg to parm name
                 if data_type == "vector" or data_type == "point":
                     parm_suffix = signature_parm_suffix_dict[vop_node.parm("signature").eval()]
-                    ip.default_value = str(vop_node.parm(str(param_name) + parm_suffix[0]).eval()) + "," + \
-                                    str(vop_node.parm(str(param_name) + parm_suffix[1]).eval()) + "," +    \
-                                    str(vop_node.parm(str(param_name) + parm_suffix[2]).eval())
+                    ip.default_value = number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[0]).eval())) + "," + \
+                                    number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[1]).eval())) + "," +    \
+                                    number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[2]).eval()))
                 else:  
-                    ip.default_value = str(vop_node.parm(param_name).eval())
+                    ip.default_value = number_formatter(str(vop_node.parm(param_name).eval()))
                 print("    *** parm is default")
                 print("    port name: " + ip.port_name)
                 print("    data type: " + ip.data_type)
                 print("    default value: " + ip.default_value)
-            dag_node.inputs.append(ip)
+            dag_node.inputs.append(ip)            
+        if dag_node.method_name == "compare": # compare need one more input which is not on input port
+            dag_node.inputs.append(compare_node_input_analyzer(vop_node))
+        if dag_node.method_name == "twoway":
+            dag_node.inputs.append(twoway_node_input_analyzer(vop_node))
         
     # create dag node output port list
     if(len(vop_node.outputConnections()) != 0):
@@ -145,7 +214,7 @@ for vop_node in vop_children:
             #port_name = node_path + "_" + output_names[output_connection.outputIndex()]
             op.port_name = output_names[output_connection.outputIndex()]
             op.port_index = output_connection.outputIndex()
-            op.data_type = output_data_types[output_connection.outputIndex()]
+            op.data_type = output_port_dataType_analyzer(output_names, output_data_types, output_connection.outputIndex())
             print("    " + str(output_connection))
             print("    connected node: " + op.connected_node)
             print("    connected index: " + str(op.connected_index))
@@ -156,7 +225,8 @@ for vop_node in vop_children:
                 print("    creating special constant node input")
                 ip = Port()
                 value_str = output_labels[output_connection.outputIndex()]
-                ip.extra_data = value_str.replace("Value: ", "")
+                const_name = vop_node.parm("constname").eval()
+                ip.extra_data = number_formatter(value_str.replace(const_name + ": ", ""))
                 print("    special constant node input port extra data: " + ip.extra_data)
                 dag_node.inputs.append(ip)
             
@@ -198,16 +268,16 @@ global_input_variable_set_list = []
 global_output_list = []
 bind_output_list = []
 
-global_input_node_type_list = ["geometryvopglobal::2.0", "parameter"]
-global_output_node_type_list = ["geometryvopoutput", "bind"]
+global_input_node_type_list = ["geometryvopglobal::2.0", "volumevopglobal"]
+global_output_node_type_list = ["geometryvopoutput", "volumevopoutput"] 
 buffer_param_name_list = ["P", "v", "force", "Cd", "N"]
-variable_type_dict = {"vector":"glm::vec3", "float":"float", "int":"int", "point":"glm::vec3", "string":"char"}
+variable_type_dict = {"vector":"glm::vec3", "float":"float", "int":"int", "point":"glm::vec3", "string":"char", "struct": "struct", "normal": "glm::vec3"}
 
 
 connection_dict = dict()
 for dag_node in sorted_dag_nodes_list:
     # === global_input_json
-    if dag_node.method_name == "geometryvopglobal::2.0":
+    if dag_node.method_name in global_input_node_type_list:
         for output in dag_node.outputs:
             port_unique_name = dag_node.node_path + "_" + output.port_name
             if not (port_unique_name in global_input_variable_set_list):
@@ -219,8 +289,9 @@ for dag_node in sorted_dag_nodes_list:
                 if output.data_type in variable_type_dict:
                     port_dict["data_type"] = variable_type_dict[output.data_type]
                 else:
-                    print("*******ERROR when find data_type in variable_type_dict!!!")
+                    print("*******ERROR when find data_type for !!! " + port_dict["data_type"] +  " !!!in variable_type_dict!!!")
                 port_dict["variable_name"] = port_unique_name
+                port_dict["port_name"] = output.port_name
                 global_input_list.append(port_dict)
         global_input_json_dict[dag_node.node_name] = global_input_list
         
@@ -237,7 +308,7 @@ for dag_node in sorted_dag_nodes_list:
         
     
     # === global_output_json
-    elif dag_node.method_name == "geometryvopoutput":
+    elif dag_node.method_name in global_output_node_type_list:
         for input in dag_node.inputs:
             port_dict = dict()
             # from connection dict get local input name
@@ -249,8 +320,9 @@ for dag_node in sorted_dag_nodes_list:
             if input.data_type in variable_type_dict:
                 port_dict["data_type"] = variable_type_dict[input.data_type]
             else:
-                print("*******ERROR when find data_type in variable_type_dict!!!")
+                print("*******ERROR when find data_type for !!! " + input.data_type +  " !!!in variable_type_dict!!!")
             port_dict["variable_name"] = dag_node.node_path + "_" + input.port_name
+            port_dict["port_name"] = input.port_name
         global_output_list.append(port_dict)
         global_output_json_dict[dag_node.node_name] = global_output_list
     
@@ -266,7 +338,7 @@ for dag_node in sorted_dag_nodes_list:
             if input.data_type in variable_type_dict:
                 port_dict["data_type"] = variable_type_dict[input.data_type]
             else:
-                print("*******ERROR when find data_type in variable_type_dict!!!")
+                print("*******ERROR when find data_type for !!! " + input.data_type +  " !!!in variable_type_dict!!!")
             port_dict["variable_name"] = "__" + port_dict["connection"] + "_" + "debug"
         bind_output_list.append(port_dict)
           
@@ -274,7 +346,9 @@ for dag_node in sorted_dag_nodes_list:
     else:
         dag_node_dict = dict()
         dag_node_dict["method_name"] = dag_node.method_name
-        
+        dag_node_dict["raw_output_names"] = dag_node.raw_output_names
+        dag_node_dict["raw_output_types"] = dag_node.raw_output_types
+
         # "input" key value
         input_list = []
         if dag_node.method_name in general_operation_list: # if general operation
@@ -326,7 +400,7 @@ for dag_node in sorted_dag_nodes_list:
                 if output.data_type in variable_type_dict:
                     port_dict["data_type"] = variable_type_dict[output.data_type]
                 else:
-                    print("*******ERROR when find data_type in variable_type_dict!!!")
+                    print("*******ERROR when find data_type for !!! " + output.data_type +  " !!!in variable_type_dict!!!")
                 port_dict["local_output_name"] = port_unique_name
                 output_list.append(port_dict)
         dag_node_dict["output"] = output_list   
