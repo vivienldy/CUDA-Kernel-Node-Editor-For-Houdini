@@ -40,17 +40,17 @@ namespace CodeGenerator
 	            x = v[0]; y = v[1]; z = v[2]; 
             }
 
-            __host__ __device__ inline bool	compare(float val, float val_to_compare, string op) {
-                if (string == "Equal") return val == val_to_compare;
-                if (string == "Less Than") return val < val_to_compare;
-                if (string == "Greater Than") return val > val_to_compare;
-                if (string == "Less Than Or Equal") return val <= val_to_compare;
-                if (string == "Greater Than Or Equal") return val >= val_to_compare;
-                if (string == "Not Equal") return val != val_to_compare;
+            __host__ __device__ inline bool	compare(float val, float val_to_compare, int opIndex) {
+                if (opIndex == 0 /*"Equal"*/) return val == val_to_compare;
+                if (opIndex == 1 /*"Less Than"*/) return val < val_to_compare;
+                if (opIndex == 2 /*"Greater Than"*/) return val > val_to_compare;
+                if (opIndex == 3 /*"Less Than Or Equal"*/) return val <= val_to_compare;
+                if (opIndex == 4 /*"Greater Than Or Equal"*/) return val >= val_to_compare;
+                if (opIndex == 5 /*"Not Equal"*/) return val != val_to_compare;
             }
 
             template<class T>
-            __host__ __device__ inline T twoway(bool condition, T input1, T input2, string signature, string conditionStr) {
+            __host__ __device__ inline T twoway(bool condition, T input1, T input2, string conditionStr) {
                 if (conditionStr == "Use Input 1 If Condition True") {
                     if (condition) return input1;
                     else return input2;
@@ -67,11 +67,12 @@ namespace CodeGenerator
 
             struct GeoDesc {
                 float[64] posList;
+                int listSize;
                 AABB bb;
             };
 
             __host__ __device__ inline float ramp(float input, GeoDesc ramp_PRM) {
-                float position = clamp(pos, 0.0f, 1.0f - 0.001f) * (64 - 1);
+                float position = clamp(pos, 0.0f, 1.0f - 0.001f) * (listSize - 1);
                 float flr = floor(position);
                 float ceil = flr + 1;
                 float v1 = ramp_PRM.posList[(int)flr] * (ceil - position);

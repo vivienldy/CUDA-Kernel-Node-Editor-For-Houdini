@@ -1,4 +1,5 @@
 #include <glm/glm.hpp>
+#include "BaseOperation.h"
 
 namespace CodeGenerator 
 { 
@@ -12,7 +13,7 @@ namespace CodeGenerator
             // Compute graph
             @COMPUTE_GRAPH@
 
-            // Write bacl
+            // Write back
             @WRITE_BACK@
         }
 	} 
