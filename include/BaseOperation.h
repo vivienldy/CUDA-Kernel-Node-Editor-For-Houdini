@@ -4,20 +4,21 @@
 
 #include "CGField.h"
 
-namespace CodeGenerator 
-{ 
+namespace CodeGenerator
+{
     namespace Field
     {
         namespace GenericCode
         {
             // ----- helper function
-            template<class T>
+            template<typename T>
             __host__ __device__ inline void VectorFieldDataSplit(
-                const CGVectorField3D<T>::RAWData& inputVectorField,
-                CGField3D<T>::RAWData* seperateScalarFields) {
-                CGField3D<T>::RAWData rawDataX;
-                CGField3D<T>::RAWData rawDataY;
-                CGField3D<T>::RAWData rawDataZ;
+                typename CGVectorField3D<T>::RAWData& inputVectorField,
+                typename CGField3D<T>::RAWData* seperateScalarFields)
+            {
+                typename CGField3D<T>::RAWData rawDataX;
+                typename CGField3D<T>::RAWData rawDataY;
+                typename CGField3D<T>::RAWData rawDataZ;
                 rawDataX.IsValid = true;
                 rawDataX.FieldInfo = inputVectorField.FieldInfoX;
                 rawDataX.VoxelData = inputVectorField.VoxelDataX;
@@ -33,17 +34,19 @@ namespace CodeGenerator
             }
 
             __host__ __device__ inline int Index3DToIndex1D(
-                int idx, 
-                int idy, 
-                int idz, 
-                CGField3DInfo& info){
+                int idx,
+                int idy,
+                int idz,
+                CGField3DInfo& info)
+            {
                 return idz * info.Resolution.x * info.Resolution.y + idy * info.Resolution.x + idx;
             }
 
-            template<class T>
+            template<typename T>
             __host__ __device__ inline glm::vec3 PosToIndex3D(
                 glm::vec3 pos,
-                CGField3D<T>::RAWData rawData) {
+                typename CGField3D<T>::RAWData rawData)
+            {
                 // according to position, calculate the x, y, z for the pos
                 int x = (pos.x - (rawData.FieldInfo.Pivot.x - rawData.FieldInfo.FieldSize.x * 0.5f)) * rawData.FieldInfo.InverseVoxelSize;
                 int y = (pos.y - (rawData.FieldInfo.Pivot.y - rawData.FieldInfo.FieldSize.y * 0.5f)) * rawData.FieldInfo.InverseVoxelSize;
@@ -51,19 +54,32 @@ namespace CodeGenerator
                 return glm::vec3(x, y, z);
             }
 
-            template<class T>
+            template<typename T>
             __host__ __device__ inline glm::vec3 PosToIndex1D(
                 glm::vec3 pos,
-                CGField3D<T>::RAWData rawData) {
+                typename CGField3D<T>::RAWData rawData)
+            {
                 glm::vec3 index3D = Field::GenericCode::PosToIndex3D<T>(pos, rawData);
                 int index1D = Field::GenericCode::Index3DToIndex1D(index3D.x, index3D.y, index3D.z, rawData.FieldInfo);
                 return index1D;
             }
 
+            __host__ __device__ inline glm::vec3 IndexToIndex3(
+                int idx, 
+                const CGField3DInfo& info)
+            {
+                glm::vec3 res = info.Resolution;
+                int nvSlice = res.x * res.y;
+                int x = idx % (int)res.x;
+                int y = (idx % nvSlice) / res.x;
+                int z = idx / nvSlice;
+                return glm::vec3(x, y, z);
+            }
+
             __host__ __device__ inline bool IsInside(
                 int idx,
                 int idy,
-                int idz, 
+                int idz,
                 const CGField3DInfo& info)
             {
                 if (idx < 0 || idx >= (int)info.Resolution.x ||
@@ -73,10 +89,8 @@ namespace CodeGenerator
                 return true;
             }
 
-            //Index3ToPos() {}
-
             // ----- GetValue SampleValue function
-            template<class T>
+            template<typename T>
             __host__ __device__ inline T GetValue(
                 int idx,
                 int idy,
@@ -87,7 +101,7 @@ namespace CodeGenerator
                 // boundary condition, if outside return 0
                 if (!Field::GenericCode::IsInside(idx, idy, idz, info))
                 {
-                    return 0; // [TODO] type?  if T int?
+                    return 0.f; // [TODO] type?  if T int?
                 }
                 else
                 {
@@ -95,11 +109,11 @@ namespace CodeGenerator
                 }
             }
 
-            template<class T>
+            template<typename T>
             __host__ __device__ inline T SampleValueScalarField(
                 glm::vec3 pos,
                 T* rawData,
-                const CGField3DInfo& info)
+                CGField3DInfo& info)
             {
                 glm::vec3 origin = info.Pivot - info.FieldSize * 0.5f;
                 glm::vec3 bboxSpace = glm::vec3(
@@ -122,25 +136,25 @@ namespace CodeGenerator
                 float cy = coordB.y - (float)lowerLeft.y;
                 float cz = coordB.z - (float)lowerLeft.z;
 
-                auto v0 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y, lowerLeft.z, rawData, info) * 0.003921f;
-                auto v1 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y, lowerLeft.z, rawData, info) * 0.003921f;
-                auto v2 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y + 1, lowerLeft.z, rawData, info) * 0.003921f;
-                auto v3 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y + 1, lowerLeft.z, rawData, info) * 0.003921f;
-                auto v4 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y, lowerLeft.z + 1, rawData, info) * 0.003921f;
-                auto v5 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y, lowerLeft.z + 1, rawData, info) * 0.003921f;
-                auto v6 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y + 1, lowerLeft.z + 1, rawData, info) * 0.003921f;
-                auto v7 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y + 1, lowerLeft.z + 1, rawData, info) * 0.003921f;
+                auto v0 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y, lowerLeft.z, rawData, info);
+                auto v1 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y, lowerLeft.z, rawData, info);
+                auto v2 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y + 1, lowerLeft.z, rawData, info);
+                auto v3 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y + 1, lowerLeft.z, rawData, info);
+                auto v4 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y, lowerLeft.z + 1, rawData, info);
+                auto v5 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y, lowerLeft.z + 1, rawData, info);
+                auto v6 = Field::GenericCode::GetValue<T>(lowerLeft.x, lowerLeft.y + 1, lowerLeft.z + 1, rawData, info);
+                auto v7 = Field::GenericCode::GetValue<T>(lowerLeft.x + 1, lowerLeft.y + 1, lowerLeft.z + 1, rawData, info);
 
                 auto vy0 = glm::mix(glm::mix(v0, v1, cx), glm::mix(v2, v3, cx), cy);
                 auto vy1 = glm::mix(glm::mix(v4, v5, cx), glm::mix(v6, v7, cx), cy);
                 return glm::mix(vy0, vy1, cz);
-            }           
+            }
 
             //SampleValue Vector3
-            template<class T>
+            template<typename T>
             __host__ __device__ inline glm::vec3 SampleValueVectorField(
-                glm::vec3 pos, 
-                CGVectorField3D<T>::RAWData& vectorField)
+                glm::vec3 pos,
+                typename CGVectorField3D<T>::RAWData& vectorField)
             {
                 CGField3D<T>::RAWData scalarFields[3];
                 Field::GenericCode::VectorFieldDataSplit<T>(vectorField, scalarFields);
@@ -149,7 +163,69 @@ namespace CodeGenerator
                 auto z = Field::GenericCode::SampleValueScalarField<T>(pos, scalarFields[2].VoxelData, scalarFields[2].FieldInfo);
                 return glm::vec3(x, y, z);
             }
-           
+
+            // scalar field set value
+            template<typename T>
+            __host__ __device__ inline void SetValueScalar(
+                int idx,
+                T value,
+                typename CGField3D<T>::RAWData& rawData)
+            {
+                rawData.VoxelData[idx] = value;
+            }
+
+            // vector field set value
+            template<typename T>
+            __host__ __device__ inline void SetValueVector3(
+                int idx,
+                glm::vec3 vec3,
+                typename CGVectorField3D<T>::RAWData& vectorField)
+            {
+                vectorField.VoxelDataX[idx] = vec3.x;
+                vectorField.VoxelDataY[idx] = vec3.y;
+                vectorField.VoxelDataZ[idx] = vec3.z;
+            }
+
+            template<typename T>
+            __host__ __device__ inline int GetNumOfVoxel(
+                typename CGVectorField3D<T>::RAWData& vectorField)
+            {
+                if (vectorField.FieldInfoX.NumVoxels == vectorField.FieldInfoY.NumVoxels &&
+                    vectorField.FieldInfoX.NumVoxels == vectorField.FieldInfoZ.NumVoxels &&
+                    vectorField.FieldInfoY.NumVoxels == vectorField.FieldInfoZ.NumVoxels) {
+                    return vectorField.FieldInfoX.NumVoxels;
+                }
+                return -1;
+            }
+
+            template<typename T>
+            __host__ __device__ inline glm::vec3 Index3ToPos(
+                int indexX, int indexY, int indexZ,
+                CGField3DInfo& info)
+            {
+
+                glm::vec3 origin = info.Pivot - info.FieldSize * 0.5f;
+                glm::vec3 localPos = glm::vec3(
+                    ((float)indexX + 0.5f) * info.VoxelSize,
+                    ((float)indexY + 0.5f) * info.VoxelSize,
+                    ((float)indexZ + 0.5f) * info.VoxelSize);
+                return localPos + origin;
+            }
+
+            template<typename T>
+            __host__ __device__ inline glm::vec3 IndexToPos(
+                int idx, 
+                typename CGVectorField3D<T>::RAWData& vectorField)
+            {
+                // because we are sure now three scalar field infos are same, so just simply get fieldX's info
+               
+                // index to index3
+                glm::vec3 idx3 = Field::GenericCode::IndexToIndex3(idx, vectorField.FieldInfoX);
+
+                // index3 to pos
+                return Field::GenericCode::Index3ToPos<T>(idx3.x, idx3.y, idx3.z, vectorField.FieldInfoX);
+            }
+
         }
     }
-} 
+}
