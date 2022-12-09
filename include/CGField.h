@@ -15,7 +15,6 @@
 
 #include "CGBuffer.h"
 
-
 struct CGField3DInfo
 {
     glm::vec3 Pivot; // center of the field
@@ -75,7 +74,7 @@ public:
         std::string voxelBufferFilePath = "") // if null initialize the voxelBuffer as zero
     {
         // initialize CGFieldInfo
-        Init(pivot, res, fieldSize, voxelSize, voxelBufferFilePath);
+        Init(pivot, res, fieldSize, voxelSize, name, voxelBufferFilePath);
         m_Name = name;
     }
 
@@ -91,7 +90,7 @@ public:
         glm::vec3 fieldSize,
         float voxelSize, 
         std::string name,
-        std::string voxelBufferFilePath = "") 
+        std::string voxelBufferFilePath) 
     {
         // initialize m_FieldInfo
         this->SetPivot(pivot);
@@ -101,19 +100,17 @@ public:
 
         // initialize m_VoxelBuffer
         m_VoxelBuffer.setName(name + ".voxels");
+        m_VoxelBuffer.setSize(m_FieldInfo.NumVoxels);
         if (voxelBufferFilePath != "") {
-            // [TODO] 问题，现在loadFromFile返回的是个pointer???
-            // [TODO] 或许需要一个CGBuffer.readFromFile()直接根据file数据初始化m_data???
-            // 因为现在已经有了m_VoxelBuffer这个实例，只是没有初始化m_data
-            // CGBuffer还需要支持非vector类型 比如1f 纯float类型的数据输入
-            m_VoxelBuffer = *(dynamic_cast<CGBuffer<T>*>(CGBuffer<T>::loadFromFile(voxelBufferFilePath)));
+            // [TODO] 或许需要一个CGBuffer.InitalizeFromFile()直接根据file数据初始化m_data
+            // 因为现在已经有了m_VoxelBuffer这个实例，我在前面set了name和size，只是没有初始化m_data信息
+            // 因为现在标量场存的是float数据，CGBuffer还需要支持非vector类型 比如1f 纯float类型的数据输入
+            m_VoxelBuffer.initializeFromFile(voxelBufferFilePath);
         }
         else {
             // [TODO] 非常需要验证是否正确是否可行。。
-           // 需要CGBuffer有一个setToZero()的function
-           // 同时，需要cgbuffer不仅有一个size，还需要有一个capacity，capacity是一个很大的定值，size是真实大小
-           // 当setToZero的时候，是按照capacity set value to zero
-            // m_VoxelBuffer.SetToZero();
+           // 需要CGBuffer有一个setToZero()的function，全部set成0.f
+           m_VoxelBuffer.setToZero();
         }
     }
 
@@ -134,6 +131,7 @@ public:
         m_FieldInfo.VoxelSize = size;
         m_FieldInfo.InverseVoxelSize = 1.0 / size;
     }
+
     // ---------- CUDA fucntion
     bool DeviceMalloc()
     {
@@ -203,6 +201,8 @@ public:
     CGField3D<T>* m_FieldY;
     CGField3D<T>* m_FieldZ;
 
+    std::string m_Name;
+
     // ---------- Pack Field Info for CPU and GPU
    // ShareCode will use this struct 
    // CPU and GPU data are different but use the same struct
@@ -226,7 +226,7 @@ public:
         rawData.FieldInfoY = this->m_FieldY->GetFieldInfo();
         rawData.FieldInfoZ = this->m_FieldZ->GetFieldInfo();
         //rawData.IsStaggeredGrid = IsStaggeredGrid();
-        return desc;
+        return rawData;
     }
 
     RAWData GetFieldRAWDataDevice()
@@ -239,7 +239,7 @@ public:
         rawData.FieldInfoY = this->m_FieldY->GetFieldInfo();
         rawData.FieldInfoZ = this->m_FieldZ->GetFieldInfo();
         //rawData.IsStaggeredGrid = IsStaggeredGrid();
-        return desc;
+        return rawData;
     }
 
     // ---------- Constructor
@@ -259,7 +259,7 @@ public:
         m_FieldX = x;
         m_FieldY = y;
         m_FieldZ = z;
-        m_sName = name;
+        m_Name = name;
     }
 
     ~CGVectorField3D()
@@ -307,17 +307,4 @@ public:
         return m_FieldX->HasDeviceData() && m_FieldY->HasDeviceData() && m_FieldZ->HasDeviceData();
     }
 };
-
-void testFieldMain() {
-    glm::vec3 pivot = glm::vec3(0.f);
-    glm::vec3 res = glm::vec3(3, 3, 3);
-    glm::vec3 fieldSize = glm::vec3(3.f, 3.f, 3.f);
-    float voxelSize = 1.f;
-    CGField3D<float> field = CGField3D<float>(
-        pivot,
-        res,
-        fieldSize,
-        voxelSize,
-        "test_field");
-}
 
