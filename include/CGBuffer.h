@@ -48,11 +48,13 @@ public:
 
 	void* getRawPtr() { return m_rawPtr; }
 
-	void reallocationHost(int appendSize) {
+	void reallocationHost(int appendSize, bool insert=true) {
 
-		std::vector<glm::vec3> vec(appendSize, glm::vec3(0.f));
-		std::vector<glm::vec3>* p = ((std::vector<glm::vec3>*)m_rawPtr);
-		p->insert(p->end(), vec.begin(), vec.end());
+		if (insert) {
+			std::vector<glm::vec3> vec(appendSize, glm::vec3(0.f));
+			std::vector<glm::vec3>* p = ((std::vector<glm::vec3>*)m_rawPtr);
+			p->insert(p->end(), vec.begin(), vec.end());
+		}
 
 		m_appendSize = appendSize;
 		m_bufferSize += appendSize;
