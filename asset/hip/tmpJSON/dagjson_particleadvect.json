@@ -40,15 +40,6 @@
         ]
     },
     "compute_graph":{
-        "add1":{
-            "method_name":"add",
-            "input":[
-
-            ],
-            "output":[
-
-            ]
-        },
         "vectofloat1":{
             "method_name":"vectofloat",
             "multi_outputs":[
@@ -98,7 +89,22 @@
             "method_name":"clamp",
             "input":[
                 {
+                    "param_name":"val",
+                    "data_type":"float",
+                    "default_value":"CG_NONE",
                     "local_input_name":"geo1_pointvop1_multiply2_product"
+                },
+                {
+                    "param_name":"min",
+                    "data_type":"float",
+                    "default_value":"0.0f",
+                    "local_input_name":"CG_NONE"
+                },
+                {
+                    "param_name":"max",
+                    "data_type":"float",
+                    "default_value":"1.0f",
+                    "local_input_name":"CG_NONE"
                 }
             ],
             "output":[

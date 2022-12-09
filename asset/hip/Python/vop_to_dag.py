@@ -19,6 +19,7 @@ class Node:
         self.outputs = [] # list of Port
         self.raw_output_names = [] # all the output names on the node, no matter if connected
         self.raw_output_types = [] # all the output types on the node, no matter if connected
+        self.inlineCode = ""
         
 def dfs(node_id, is_node_visited_list, visit_nodes_list, dag_nodes_list):
     global node_name_id_dict
@@ -36,11 +37,15 @@ def dfs(node_id, is_node_visited_list, visit_nodes_list, dag_nodes_list):
     visit_nodes_list.append(dag_node)
 
 def is_buffer(port_name):
+    import re
     global buffer_param_name_list
     for name in buffer_param_name_list:
-
-        if port_name.find("_"+name) != -1:
+        pattern = "_" + name + "$"
+        if re.search(pattern, port_name):
             return "True"
+        # if port_name.find("_" + name) != -1:
+        #     print("global input is buffer " + port_name + " find: " + name)
+        #     return "True"
     return "False"
 
 # GPU is not friendly to double
@@ -71,41 +76,52 @@ def output_port_dataType_analyzer(raw_output_names, raw_output_datatypes, index)
     return raw_output_datatypes[index]
 
 def compare_node_input_analyzer(vop_node):
-    compare_operation_dict = {"eq" : "equal", "lt" : "less than", "gt" : "greater than", "lte": "less than or equal", "gte": "greater than or equal", "neq": "not equal"}
+    compare_operation_dict = {"eq" : "0", "lt" : "1", "gt" : "2", "lte": "3", "gte": "4", "neq": "5"}
     ip = Port()
     ip.port_name = "compare_operation"
-    ip.data_type = "string"
+    ip.data_type = "int"
     ip.default_value = compare_operation_dict[vop_node.parm("cmp").eval()]
     return ip
 """
 {
                     "param_name":"compare_operation",
-                    "data_type":"string",
-                    "default_value":"less than",
+                    "data_type":"int",
+                    "default_value":"1",
                     "local_input_name":"CG_NONE"
 }
 """
 
 def twoway_node_input_analyzer(vop_node):
-    compare_operation_dict = {0 : "use input 1 if condition true", 1 : "use input 1 if condition false"}
     ip = Port()
     ip.port_name = "condition_type"
-    ip.data_type = "string"
-    ip.default_value = compare_operation_dict[vop_node.parm("condtype").eval()]
+    ip.data_type = "int"
+    ip.default_value = str(vop_node.parm("condtype").eval())
     return ip
 """
 {
                     "param_name":"condition_type",
-                    "data_type":"string",
-                    "default_value":"use input 1 if condition true",
+                    "data_type":"int",
+                    "default_value":"0",
                     "local_input_name":"CG_NONE"
 }
 """
 
+def create_raw_output_json_pair(output_names, output_data_types, node_path):
+    global variable_type_dict
+    raw_output_list = []
+    for i in range(len(output_names)):
+        name = output_names[i]
+        data_type = output_data_types[i]
+        raw_output_dict = dict()
+        raw_output_dict["data_type"] = variable_type_dict[data_type] 
+        raw_output_dict["local_output_name"] = node_path + "_" + name
+        raw_output_list.append(raw_output_dict)
+    return raw_output_list
+
             
 
 # ========= global value
-general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway"]
+general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway", "floattovec", "clamp"]
 signature_parm_suffix_dict = {"default": ["1", "2", "3"], "v":["_v1", "_v2", "_v3"], "p":["_p1", "_p2", "_p3"], "c":["_cr", "_cg", "_cb"], "n":["_n1", "_n2", "_n3"]} # uv, un, up, uc...
 
 # get the current python node
@@ -132,8 +148,15 @@ for vop_node in vop_children:
     dag_node.node_name_digit = vop_node.digitsInName()
     dag_node.id = len(dag_nodes_list)
     dag_node.node_path = node_path
+    
     dag_node.raw_output_names = list(vop_node.outputNames())
     dag_node.raw_output_types = list(vop_node.outputDataTypes())
+
+    # ==== if vop node is inline analyze specially and continue
+    if vop_node.parm("__inlineCode"):
+        dag_node.inlineCode = vop_node.parm("__inlineCode").eval()
+        dag_node.method_name = "inlineCode"
+
     # ==== create dag node input port list
     if dag_node.method_name not in general_operation_list: # if is base operator: add, multiply only save inputConnections to DAG Node
         if(len(vop_node.inputConnections()) != 0):
@@ -271,7 +294,7 @@ bind_output_list = []
 global_input_node_type_list = ["geometryvopglobal::2.0", "volumevopglobal"]
 global_output_node_type_list = ["geometryvopoutput", "volumevopoutput"] 
 buffer_param_name_list = ["P", "v", "force", "Cd", "N"]
-variable_type_dict = {"vector":"glm::vec3", "float":"float", "int":"int", "point":"glm::vec3", "string":"char", "struct": "struct", "normal": "glm::vec3"}
+variable_type_dict = {"vector":"glm::vec3", "float":"float", "int":"int", "point":"glm::vec3", "string":"char", "struct": "struct", "normal": "glm::vec3", "stringa" : "char", "floata": "float", "struct_FloatRamp": "int"}
 
 
 connection_dict = dict()
@@ -346,9 +369,13 @@ for dag_node in sorted_dag_nodes_list:
     else:
         dag_node_dict = dict()
         dag_node_dict["method_name"] = dag_node.method_name
-        dag_node_dict["raw_output_names"] = dag_node.raw_output_names
-        dag_node_dict["raw_output_types"] = dag_node.raw_output_types
+        if(len(dag_node.raw_output_names) > 1):
+            dag_node_dict["multi_outputs"] = create_raw_output_json_pair(dag_node.raw_output_names, dag_node.raw_output_types, dag_node.node_path)
 
+        # special for inlineCode node
+        if(dag_node.inlineCode != ""):
+            dag_node_dict["content"] = dag_node.inlineCode
+        
         # "input" key value
         input_list = []
         if dag_node.method_name in general_operation_list: # if general operation
@@ -419,3 +446,29 @@ json_str = json.dumps(dag_json_dict)
 geo = this_node.geometry()
 geo.addAttrib(hou.attribType.Global, "dag_json", "")
 geo.setGlobalAttribValue("dag_json", json_str)
+
+
+
+"""
+ "threadIdx":{
+            "method_name":"inlineCode",
+            "content":"int geo1_volumevop1_threadIdx_idx = idx;"
+        }
+"""
+
+"""
+"ToVoxelCenter":{
+    "method_name":"ToVoxelCenter",
+    "input":[
+        {
+            "local_input_name":"geo1_volumevop1_threadIdx_idx"
+        }
+    ],
+    "output":[
+        {
+            "data_type":"glm::vec3",
+            "local_output_name":"geo1_volumevop1_ToVoxelCenter_p"
+        }
+    ]
+},
+"""

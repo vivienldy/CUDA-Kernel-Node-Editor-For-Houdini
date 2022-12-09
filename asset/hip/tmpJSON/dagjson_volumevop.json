@@ -40,7 +40,8 @@
     },
     "compute_graph":{
         "threadIdx":{
-            "method_name":"threadIdx",
+            "method_name":"inlineCode",
+            "content":"int geo1_volumevop1_threadIdx_idx = idx;",
             "input":[
 
             ],
