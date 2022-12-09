@@ -619,18 +619,28 @@
                     "local_output_name":"geo1_volumevop1_add2_sum"
                 }
             ]
+        },
+        "setVoxelData":{
+            "method_name":"setVoxelData",
+            "input":[
+                {
+                    "local_input_name":"geo1_volumevop1_volumevopglobal1_OpInput1"
+                },
+                {
+                    "local_input_name":"geo1_volumevop1_add2_sum"
+                },
+                {
+                    "local_input_name":"geo1_volumevop1_threadIdx_idx"
+                }
+            ],
+            "output":[
+
+            ]
         }
     },
     "global_output":{
         "custom_param":[
-        ],
-        "volumevopoutput1":[
-            {
-                "connection":"geo1_volumevop1_add2_sum",
-                "data_type":"glm::vec3",
-                "variable_name":"geo1_volumevop1_vel",
-                "port_name":"vel"
-            }
+
         ]
     }
 }
