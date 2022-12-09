@@ -34,7 +34,7 @@ def getInputBufferDict(jsonObj):
     for input_node_key in global_input:
         input_node = global_input[input_node_key]
         
-        if input_node_key == "volumevopglobal1":
+        if ("volumevopglobal" in input_node_key) or ("geometryvopglobal" in input_node_key):
             for input_port in input_node:
                 if input_port["is_buffer"] == "True":
                     buffer_dict[input_port["port_name"]] = input_port["variable_name"]
@@ -110,8 +110,13 @@ def constantMethodGenerator(node):
     cd.left  = node["output"][0]["data_type"] + " " + node["output"][0]["local_output_name"]
     cd.right = node["output"][0]["data_type"] + "(" + node["input"][0]["local_input_name"] + ")"
     return cd.toCode()
-    
+
+# inlineCode Node
+def inlineCodeMethodGenerator(node):
+    return node["content"] + "\n"
+
 # General Case 
+
 def generalGenerator(node):
     result = ""
     
@@ -160,7 +165,8 @@ customCodeGeneratorMap = {
     "subtract":subtractMethodGenerator,
     "constant":constantMethodGenerator,
     "negate":negateMethodGenerator,
-    "complement":complementMethodGenerator
+    "complement":complementMethodGenerator,
+    "inlineCode":inlineCodeMethodGenerator
     }
     
 # ----- Code Segment Generators -----
@@ -177,7 +183,7 @@ def ParmListGenerator(jsonObj):
     for input_node_key in global_input:
         input_node = global_input[input_node_key]
         
-        if input_node_key == "volumevopglobal1":
+        if ("volumevopglobal" in input_node_key) or ("geometryvopglobal" in input_node_key):
             for input_port in input_node:
                 # check buffer type
                 if input_port["is_buffer"] == "True":
@@ -193,7 +199,7 @@ def ParmListGenerator(jsonObj):
     for output_node_key in global_output:
         output_node = global_output[output_node_key]
         
-        if output_node_key == "volumevopoutput1":
+        if ("volumevopoutput1" in output_node_key) or ("geometryvopoutput" in output_node_key):
             for output_port in output_node:
                 # param in "volumevopoutput1" are all buffer data
                 # we don't won't duplicate param
@@ -217,7 +223,7 @@ def dataLoadGenerator(jsonObj):
     for input_node_key in global_input:
         input_node = global_input[input_node_key]
         
-        if input_node_key == "volumevopglobal1":
+        if ("volumevopglobal" in input_node_key) or ("geometryvopglobal" in input_node_key):
             result += "// Geometry Global Input\n"   
             for input_port in input_node:
                 cd = Codeline()
@@ -251,7 +257,7 @@ def writeBackGenerator(jsonObj):
     global_output = jsonObj["global_output"]
     for output_node_key in global_output:
         output_node = global_output[output_node_key]
-        if output_node_key == "volumevopoutput1":
+        if ("volumevopoutput1" in output_node_key) or ("geometryvopoutput" in output_node_key):
             for output_port in output_node:
                 cd = Codeline()
                 cd.left = output_port["data_type"] + " " + "global_output_" + output_port["variable_name"] # i.e., vec3 global_output_p
@@ -302,7 +308,8 @@ for code_segment in code_segments:
         filedata = filedata.replace(tmp_str, target_code)
 
 # Output sharecode to file
-with open('./Code_VEL/ShareCode.h', 'w') as file:
-  file.write(filedata)   
-  
+file_name = "./Code_VEL/" + funcNameGenerator(jsonObj=jsonObj) + ".GenericCode.h"
+with open(file_name, 'w') as file:
+  file.write(filedata) 
+
   

@@ -296,7 +296,7 @@ for code_segment in code_segments_cu:
         target_code = replacementMap[code_segment](jsonObj)
         filedata_cu = filedata_cu.replace(tmp_str, target_code)
 
-# Output sharecode to file
+# Output CUDA to file
 file_name_cuh = "./Code/" + fileNameGenerator(jsonObj=jsonObj) + ".cuh"
 with open(file_name_cuh, 'w') as file:
   file.write(filedata_cuh) 
