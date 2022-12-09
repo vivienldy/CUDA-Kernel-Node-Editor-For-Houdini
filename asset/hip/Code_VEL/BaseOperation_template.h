@@ -4,118 +4,83 @@
 
 #include "CGField.h"
 
-namespace CodeGenerator
-{
+namespace CodeGenerator 
+{ 
     namespace Field
     {
         namespace GenericCode
         {
             // ----- helper function
-            __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos, glm::vec3 freq, glm::vec3 offset, glm::vec3 nml, string type, string geo, int turb, int bounce, float amp, float rough, float atten, float distance, float radius, float h)
-            {
+            __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos, glm::vec3 freq, glm::vec3 offset, glm::vec3 nml, string type, string geo, int turb, int bounce, float amp, float rough, float atten, float distance, float radius, float h) {
                 return glm::vec3(1.f);
             }
 
-            __host__ __device__ inline float fit(float x, float omin, float omax, float nmin, float nmax)
-            {
+            __host__ __device__ inline float fit(float x, float omin, float omax, float nmin, float nmax) {
                 float t;
-                t = glm::clamp((x - omin) / (omax - omin), 0, 1);
+                t = glm::clamp((x - omin)/(omax - omin), 0, 1);
                 return glm::mix(nmin, nmax, t);
             }
 
-            __host__ __device__ inline float length(glm::vec3 vec)
-            {
+            template<class T>
+            __host__ __device__ inline float length(T vec) {
                 return glm::length(vec);
             }
 
-            __host__ __device__ inline glm::vec3 normalize(glm::vec3 vec)
-            {
+            template<class T>
+            __host__ __device__ inline T normalize(T vec) {
                 return glm::normalize(vec);
             }
 
-            __host__ __device__ inline glm::vec3 cross(glm::vec3 a, glm::vec3 b)
-            {
+            template<class T>
+            __host__ __device__ inline float cross(T a, T b) {
                 return glm::cross(a, b);
             }
 
-            __host__ __device__ inline void vectofloat(glm::vec3 v, float *x, float *y, float *z)
-            {
-                x = v[0];
-                y = v[1];
-                z = v[2];
+            __host__ __device__ inline void	vectofloat(glm::vec3 v, float* x, float* y, float* z) {
+	            x = v[0]; y = v[1]; z = v[2]; 
             }
 
-            __host__ __device__ inline glm::vec3 floattovec(float x, float y, float z)
-            {
-                return glm::vec3(x, y, z);
+            __host__ __device__ inline bool	compare(float val, float val_to_compare, int opIndex) {
+                if (opIndex == 0 /*"Equal"*/) return val == val_to_compare;
+                if (opIndex == 1 /*"Less Than"*/) return val < val_to_compare;
+                if (opIndex == 2 /*"Greater Than"*/) return val > val_to_compare;
+                if (opIndex == 3 /*"Less Than Or Equal"*/) return val <= val_to_compare;
+                if (opIndex == 4 /*"Greater Than Or Equal"*/) return val >= val_to_compare;
+                if (opIndex == 5 /*"Not Equal"*/) return val != val_to_compare;
             }
 
-            __host__ __device__ inline float clamp(float val, float min, float max)
-            {
-                return glm::clamp(val, min, max);
-            }
-
-            __host__ __device__ inline bool compare(float val, float val_to_compare, int opIndex)
-            {
-                if (opIndex == 0 /*"Equal"*/)
-                    return val == val_to_compare;
-                if (opIndex == 1 /*"Less Than"*/)
-                    return val < val_to_compare;
-                if (opIndex == 2 /*"Greater Than"*/)
-                    return val > val_to_compare;
-                if (opIndex == 3 /*"Less Than Or Equal"*/)
-                    return val <= val_to_compare;
-                if (opIndex == 4 /*"Greater Than Or Equal"*/)
-                    return val >= val_to_compare;
-                if (opIndex == 5 /*"Not Equal"*/)
-                    return val != val_to_compare;
-            }
-
-            __host__ __device__ inline glm::vec3 twoway(bool condition, glm::vec3 input1, glm::vec3 input2, int conditionIdx)
-            {
-                if (conditionIdx == 0)
-                {
-                    if (condition)
-                        return input1;
-                    else
-                        return input2;
+            template<class T>
+            __host__ __device__ inline T twoway(bool condition, T input1, T input2, string conditionStr) {
+                if (conditionStr == "Use Input 1 If Condition True") {
+                    if (condition) return input1;
+                    else return input2;
                 }
-                else
-                {
-                    if (!condition)
-                        return input1;
-                    else
-                        return input2;
+                else {
+                    if (!condition) return input1;
+                    else return input2;
                 }
             }
-            struct AABB
-            {
+            struct AABB {
                 glm::vec3 upperBound;
                 glm::vec3 lowerBound;
             };
 
-            struct GeoDesc
-            {
+            struct GeoDesc {
                 float[64] posList;
                 int listSize;
                 AABB bb;
             };
 
-            __host__ __device__ inline float ramp(float input, GeoDesc ramp_PRM)
-            {
-                // float position = clamp(pos, 0.0f, 1.0f - 0.001f) * (listSize - 1);
-                // float flr = floor(position);
-                // float ceil = flr + 1;
-                // float v1 = ramp_PRM.posList[(int)flr] * (ceil - position);
-                // float v2 = ramp_PRM.posList[(int)ceil] * (position - flr);
-                //return v1 + v2;
-                if (input > 1.f) return 1.f;
-                else if (input < 0.f) reuturn 0.f;
-                else return input;
+            __host__ __device__ inline float ramp(float input, GeoDesc ramp_PRM) {
+                float position = clamp(pos, 0.0f, 1.0f - 0.001f) * (listSize - 1);
+                float flr = floor(position);
+                float ceil = flr + 1;
+                float v1 = ramp_PRM.posList[(int)flr] * (ceil - position);
+                float v2 = ramp_PRM.posList[(int)ceil] * (position - flr);
+                return v1 + v2;
             }
 
-            __host__ __device__ inline glm::vec3 relbbox(GeoDesc file, glm::vec3 pos)
-            {
+            __host__ __device__ inline glm::vec3 relbbox(GeoDesc file, glm::vec3 pos) {
                 glm::vec3 bbdelta = glm::vec3(0.f);
                 bbdelta[0] = (pos[0] - file.bb.lowerBound[0]) / (file.bb.upperBound[0] - file.bb.lowerBound[0]);
                 bbdelta[1] = (pos[1] - file.bb.lowerBound[1]) / (file.bb.upperBound[1] - file.bb.lowerBound[1]);
@@ -123,11 +88,11 @@ namespace CodeGenerator
                 return bbdelta;
             }
 
-            template <class T>
+
+            template<class T>
             __host__ __device__ inline void VectorFieldDataSplit(
-                const CGVectorField3D<T>::RAWData &inputVectorField,
-                CGField3D<T>::RAWData *seperateScalarFields)
-            {
+                const CGVectorField3D<T>::RAWData& inputVectorField,
+                CGField3D<T>::RAWData* seperateScalarFields) {
                 CGField3D<T>::RAWData rawDataX;
                 CGField3D<T>::RAWData rawDataY;
                 CGField3D<T>::RAWData rawDataZ;
@@ -146,19 +111,17 @@ namespace CodeGenerator
             }
 
             __host__ __device__ inline int Index3DToIndex1D(
-                int idx,
-                int idy,
-                int idz,
-                CGField3DInfo &info)
-            {
+                int idx, 
+                int idy, 
+                int idz, 
+                CGField3DInfo& info){
                 return idz * info.Resolution.x * info.Resolution.y + idy * info.Resolution.x + idx;
             }
 
-            template <class T>
+            template<class T>
             __host__ __device__ inline glm::vec3 PosToIndex3D(
                 glm::vec3 pos,
-                CGField3D<T>::RAWData rawData)
-            {
+                CGField3D<T>::RAWData rawData) {
                 // according to position, calculate the x, y, z for the pos
                 int x = (pos.x - (rawData.FieldInfo.Pivot.x - rawData.FieldInfo.FieldSize.x * 0.5f)) * rawData.FieldInfo.InverseVoxelSize;
                 int y = (pos.y - (rawData.FieldInfo.Pivot.y - rawData.FieldInfo.FieldSize.y * 0.5f)) * rawData.FieldInfo.InverseVoxelSize;
@@ -166,11 +129,10 @@ namespace CodeGenerator
                 return glm::vec3(x, y, z);
             }
 
-            template <class T>
+            template<class T>
             __host__ __device__ inline glm::vec3 PosToIndex1D(
                 glm::vec3 pos,
-                CGField3D<T>::RAWData rawData)
-            {
+                CGField3D<T>::RAWData rawData) {
                 glm::vec3 index3D = Field::GenericCode::PosToIndex3D<T>(pos, rawData);
                 int index1D = Field::GenericCode::Index3DToIndex1D(index3D.x, index3D.y, index3D.z, rawData.FieldInfo);
                 return index1D;
@@ -179,8 +141,8 @@ namespace CodeGenerator
             __host__ __device__ inline bool IsInside(
                 int idx,
                 int idy,
-                int idz,
-                const CGField3DInfo &info)
+                int idz, 
+                const CGField3DInfo& info)
             {
                 if (idx < 0 || idx >= (int)info.Resolution.x ||
                     idy < 0 || idy >= (int)info.Resolution.y ||
@@ -189,16 +151,16 @@ namespace CodeGenerator
                 return true;
             }
 
-            // Index3ToPos() {}
+            //Index3ToPos() {}
 
             // ----- GetValue SampleValue function
-            template <class T>
+            template<class T>
             __host__ __device__ inline T GetValue(
                 int idx,
                 int idy,
                 int idz,
-                T *rawData,
-                CGField3DInfo &info)
+                T* rawData,
+                CGField3DInfo& info)
             {
                 // boundary condition, if outside return 0
                 if (!Field::GenericCode::IsInside(idx, idy, idz, info))
@@ -211,11 +173,11 @@ namespace CodeGenerator
                 }
             }
 
-            template <class T>
+            template<class T>
             __host__ __device__ inline T SampleValueScalarField(
                 glm::vec3 pos,
-                T *rawData,
-                const CGField3DInfo &info)
+                T* rawData,
+                const CGField3DInfo& info)
             {
                 glm::vec3 origin = info.Pivot - info.FieldSize * 0.5f;
                 glm::vec3 bboxSpace = glm::vec3(
@@ -250,13 +212,13 @@ namespace CodeGenerator
                 auto vy0 = glm::mix(glm::mix(v0, v1, cx), glm::mix(v2, v3, cx), cy);
                 auto vy1 = glm::mix(glm::mix(v4, v5, cx), glm::mix(v6, v7, cx), cy);
                 return glm::mix(vy0, vy1, cz);
-            }
+            }           
 
-            // SampleValue Vector3
-            template <class T>
+            //SampleValue Vector3
+            template<class T>
             __host__ __device__ inline glm::vec3 SampleValueVectorField(
-                glm::vec3 pos,
-                CGVectorField3D<T>::RAWData &vectorField)
+                glm::vec3 pos, 
+                CGVectorField3D<T>::RAWData& vectorField)
             {
                 CGField3D<T>::RAWData scalarFields[3];
                 Field::GenericCode::VectorFieldDataSplit<T>(vectorField, scalarFields);
@@ -265,7 +227,7 @@ namespace CodeGenerator
                 auto z = Field::GenericCode::SampleValueScalarField<T>(pos, scalarFields[2].VoxelData, scalarFields[2].FieldInfo);
                 return glm::vec3(x, y, z);
             }
-
+           
         }
     }
-}
+} 
