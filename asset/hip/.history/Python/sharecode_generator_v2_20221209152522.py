@@ -117,14 +117,12 @@ def generalGenerator(node):
 
     # no output, i.e. settovoxel
     if len(node["output"]) == 0:
+        
         for port in node["input"]:
             if node["input"].index(port) == input_len - 1:
                 cd.right += port["local_input_name"]
             else:
                 cd.right += port["local_input_name"] + ", "
-        cd.right += ")"
-        result = cd.right
-        return result
 
     for port in node["input"]:
         if not port["local_input_name"] == "CG_NONE":

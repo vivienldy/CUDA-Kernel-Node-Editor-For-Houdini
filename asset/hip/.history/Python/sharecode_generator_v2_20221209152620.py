@@ -126,6 +126,7 @@ def generalGenerator(node):
         result = cd.right
         return result
 
+
     for port in node["input"]:
         if not port["local_input_name"] == "CG_NONE":
             if node["input"].index(port) == input_len -1:

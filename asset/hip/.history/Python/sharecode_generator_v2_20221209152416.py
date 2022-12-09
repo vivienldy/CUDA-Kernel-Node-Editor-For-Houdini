@@ -105,7 +105,7 @@ def inlineCodeMethodGenerator(node):
 
 def generalGenerator(node):
     result = ""
-       
+    
     if "multi_outputs" in node:
         for port in node["multi_outputs"]:
             result += port["data_type"] + " " + port["local_output_name"] + ";\n"
@@ -115,17 +115,7 @@ def generalGenerator(node):
     
     cd.right += node["method_name"] + "("
 
-    # no output, i.e. settovoxel
-    if len(node["output"]) == 0:
-        for port in node["input"]:
-            if node["input"].index(port) == input_len - 1:
-                cd.right += port["local_input_name"]
-            else:
-                cd.right += port["local_input_name"] + ", "
-        cd.right += ")"
-        result = cd.right
-        return result
-
+    
     for port in node["input"]:
         if not port["local_input_name"] == "CG_NONE":
             if node["input"].index(port) == input_len -1:
