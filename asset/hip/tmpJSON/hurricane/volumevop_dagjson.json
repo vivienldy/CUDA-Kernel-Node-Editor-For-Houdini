@@ -28,13 +28,15 @@
                 "is_buffer":"False",
                 "data_type":"struct",
                 "variable_name":"geo1_volumevop1_volumevopglobal1_OpInput1",
-                "port_name":"OpInput1"
+                "port_name":"OpInput1",
+                "is_OpInput":"True"
             },
             {
                 "is_buffer":"False",
                 "data_type":"struct",
                 "variable_name":"geo1_volumevop1_volumevopglobal1_OpInput2",
-                "port_name":"OpInput2"
+                "port_name":"OpInput2",
+                "is_OpInput":"True"
             }
         ]
     },
