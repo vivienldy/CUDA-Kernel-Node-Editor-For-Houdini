@@ -25,19 +25,13 @@
         ],
         "volumevopglobal1":[
             {
-                "is_buffer":"True",
-                "data_type":"glm::vec3",
-                "variable_name":"geo1_volumevop1_volumevopglobal1_P",
-                "port_name":"P"
-            },
-            {
-                "is_buffer":"True",
+                "is_buffer":"False",
                 "data_type":"struct",
                 "variable_name":"geo1_volumevop1_volumevopglobal1_OpInput1",
                 "port_name":"OpInput1"
             },
             {
-                "is_buffer":"True",
+                "is_buffer":"False",
                 "data_type":"struct",
                 "variable_name":"geo1_volumevop1_volumevopglobal1_OpInput2",
                 "port_name":"OpInput2"
@@ -45,6 +39,32 @@
         ]
     },
     "compute_graph":{
+        "threadIdx":{
+            "method_name":"threadIdx",
+            "input":[
+
+            ],
+            "output":[
+                {
+                    "data_type":"int",
+                    "local_output_name":"geo1_volumevop1_threadIdx_idx"
+                }
+            ]
+        },
+        "ToVoxelCenter":{
+            "method_name":"ToVoxelCenter",
+            "input":[
+                {
+                    "local_input_name":"geo1_volumevop1_threadIdx_idx"
+                }
+            ],
+            "output":[
+                {
+                    "data_type":"glm::vec3",
+                    "local_output_name":"geo1_volumevop1_ToVoxelCenter_p"
+                }
+            ]
+        },
         "input6":{
             "method_name":"constant",
             "input":[
@@ -94,7 +114,7 @@
                     "local_input_name":"geo1_volumevop1_volumevopglobal1_OpInput2"
                 },
                 {
-                    "local_input_name":"geo1_volumevop1_volumevopglobal1_P"
+                    "local_input_name":"geo1_volumevop1_ToVoxelCenter_p"
                 }
             ],
             "output":[
@@ -335,7 +355,7 @@
                     "local_input_name":"geo1_volumevop1_volumevopglobal1_OpInput1"
                 },
                 {
-                    "local_input_name":"geo1_volumevop1_volumevopglobal1_P"
+                    "local_input_name":"geo1_volumevop1_ToVoxelCenter_p"
                 }
             ],
             "output":[
