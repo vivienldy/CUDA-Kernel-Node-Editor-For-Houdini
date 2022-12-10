@@ -350,7 +350,7 @@ for dag_node in sorted_dag_nodes_list:
                 print("*******ERROR when find data_type for !!! " + input.data_type +  " !!!in variable_type_dict!!!")
             port_dict["variable_name"] = dag_node.node_path + "_" + input.port_name
             port_dict["port_name"] = input.port_name
-        global_output_list.append(port_dict)
+            global_output_list.append(port_dict)
         global_output_json_dict[dag_node.node_name] = global_output_list
     
     elif dag_node.method_name == "bind":
