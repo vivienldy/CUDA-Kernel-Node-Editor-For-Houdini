@@ -5,69 +5,17 @@
 #include "CGGenerator.h"
 #include "CGGeometry.h"
 
-#define CPU_VERSION 0
-#define GPU_VERSION 1
+#define CPU_VERSION 1
+#define GPU_VERSION 0
 
-void testFieldMain() {
-    glm::vec3 pivot = glm::vec3(0.f);
-
-    glm::vec3 res = glm::vec3(5, 5, 5);
-
-    glm::vec3 fieldSize = glm::vec3(1.8f, 1.8f, 1.8f);
-
-    float voxelSize = 0.36f;
-
-    std::string filename = "../userInputData/3dfield_data.txt";
-
-    CGField3D<float>* fieldX = new CGField3D<float>(
-        pivot,
-        res,
-        fieldSize,
-        voxelSize,
-        "test_field_x",
-        filename);
-
-    CGField3D<float>* fieldY = new CGField3D<float>(
-        pivot,
-        res,
-        fieldSize,
-        voxelSize,
-        "test_field_y",
-        filename);
-
-    CGField3D<float>* fieldZ = new CGField3D<float>(
-        pivot,
-        res,
-        fieldSize,
-        voxelSize,
-        "test_field_z",
-        filename);
-
-    CGVectorField3D<float>* velocityField = new CGVectorField3D<float>(
-        fieldX,
-        fieldY,
-        fieldZ,
-        "velocity_field"
-        );
-
-    std::cout << "---------" << std::endl;
-
-    std::string posFileName = "../userInputData/3dfield_pos_data.txt";
-    CGBuffer<glm::vec3>* posBuffer = dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(posFileName));
-    auto posData = posBuffer->getData();
-
-    //glm::vec3 pos = glm::vec3(0.612341f, -0.661776f, 0.323438f);
-    //auto vel = CodeGenerator::Field::GenericCode::SampleValueVectorField<float>(pos, velocityField->GetFieldRAWData());
-    //std::cout << "vel: " << vel.x << ", " << vel.y << ", " << vel.z << std::endl;
-
-
-    for (int i = 0; i < posBuffer->getSize(); ++i) {
-        auto pos = posData[i];
-
-        auto vel = CodeGenerator::Field::GenericCode::SampleValueVectorField<float>(pos, velocityField->GetFieldRAWData());
-        std::cout << "vel: " << vel.x << ", " << vel.y << ", " << vel.z << std::endl;
-    }
-
+void colorCreateVolumeCreate() {
+    glm::vec3 pivot = glm::vec3(-1.f, 0.6f, 3.7f);
+    glm::vec3 res = glm::vec3(65, 7, 64);
+    glm::vec3 fieldSize = glm::vec3(13.f, 1.4f, 12.8f);
+    float voxelSize = 0.2f;
+    std::string filename = "../userInputData/color_create_volume.txt";
+    CGField3D<float>* noiseColor = new CGField3D<float>(pivot, res, fieldSize, voxelSize, "noise_color", filename);
+    CGVectorField3D<float>* colorField = new CGVectorField3D<float>(noiseColor, noiseColor, noiseColor, "noise_color_field");
 }
 
 int main() {
@@ -76,12 +24,13 @@ int main() {
     // load pbuffer from file
 
     int numPoints = 500;
-    auto posBuffer = new CGBuffer<glm::vec3>("pos", numPoints, glm::vec3(0.f));
+    auto posBuffer = new CGBuffer<glm::vec3>("position", numPoints, glm::vec3(0.f));
 
     // dynamically create and initialize buffers
-    auto velBuffer = new CGBuffer<glm::vec3>("vel", numPoints, glm::vec3(0.f));
+    auto velBuffer = new CGBuffer<glm::vec3>("velocity", numPoints, glm::vec3(0.f));
     auto ageBuffer = new CGBuffer<float>("age", numPoints, 0.f);
-    auto cdBuffer = new CGBuffer<glm::vec3>("age", numPoints, glm::vec3(0.f));
+    auto cdBuffer = new CGBuffer<glm::vec3>("color", numPoints, glm::vec3(0.f));
+    auto agePingpongBuffer = new CGBuffer<float>("age", numPoints, 0.f); 
 
     // ===== create particle emitter
     // initilize data read from task json
@@ -90,11 +39,12 @@ int main() {
     desc.speed = 2;
     desc.size = glm::vec2(12, 12);
     desc.deltaX = 0.27f;
-    desc.center = glm::vec3(-1.01811f, 0.539828f, 3.67439f);
+    desc.center = glm::vec3(-1.f, 0.5f, 3.7f);
 
     ParticleGenerator* particleGenerator = new ParticleGenerator(desc);
     particleGenerator->delegatePointBuffer(posBuffer);
     particleGenerator->delegatePointBuffer(ageBuffer);
+    particleGenerator->delegatePointBuffer(agePingpongBuffer);
     particleGenerator->delegatePointBuffer(velBuffer);
     particleGenerator->delegatePointBuffer(cdBuffer);
 
@@ -149,10 +99,18 @@ int main() {
     CGAABB volumeVop_OpInput2_bbox = CGAABB(aabb_min, aabb_max);
     CGGeometry* volumeVop1_OpInput2 = new CGGeometry(volumeVop_OpInput2_bbox, nullptr, nullptr, nullptr);
 
-    // particleAdvectVop_OpInput1: a volume for create color
+    // particleAdvectVop_OpInput1: a volume for creating color
     // particleAdvectVop_OpInput2: a velocity field
-    CGGeometry* particleAdvectVop_OpInput1 = new CGGeometry(CGAABB(), nullptr, nullptr, velocityField);
-    // need a new volume here
+    // create the volume for creating color from file
+    glm::vec3 cdVolumePivot = glm::vec3(-1.f, 0.6f, 3.7f);
+    glm::vec3  cdVolumeRes = glm::vec3(65, 7, 64);
+    glm::vec3  cdVolumeFieldSize = glm::vec3(13.f, 1.4f, 12.8f);
+    float  cdVolumeVoxelSize = 0.2f;
+    std::string  cdVolumeFilename = "../userInputData/color_create_volume.txt";
+    CGField3D<float>* noiseColor = new CGField3D<float>(cdVolumePivot, cdVolumeRes, cdVolumeFieldSize, cdVolumeVoxelSize, "noise_color", cdVolumeFilename);
+    CGVectorField3D<float>* colorField = new CGVectorField3D<float>(noiseColor, noiseColor, noiseColor, "noise_color_field");
+    CGGeometry* particleAdvectVop_OpInput1 = new CGGeometry(CGAABB(), nullptr, nullptr, colorField);
+
     CGGeometry* particleAdvectVop_OpInput2 = new CGGeometry(CGAABB(), nullptr, nullptr, velocityField);
 
      // ===== load from task json
@@ -180,10 +138,18 @@ int main() {
             volumeVop1_OpInput1,
             volumeVop1_OpInput2);
 
-        //CodeGenerator::ParticleAdvect(
-        //    posBuffer, 
-        //    TimeInc, 
-        //    particleAdvectVop_OpInput2);
+        CodeGenerator::ParticleAdvect(
+            particleAdvectVop_offset,
+            particleAdvectVop_input3,
+            particleAdvectVop_input2,
+            posBuffer, 
+            ageBuffer,
+            cdBuffer,
+            TimeInc, 
+            particleAdvectVop_OpInput1,
+            particleAdvectVop_OpInput2,
+            agePingpongBuffer);
+        ageBuffer->copy(agePingpongBuffer);
 #elif GPU_VERSION
         // particle emitter
         // first load pos buffer to device
@@ -212,7 +178,7 @@ int main() {
         posBuffer->loadDeviceToHost();
 #endif
 
-        // save pos buffer as obj file
+        // save vel_field buffer as obj file
         std::string frame = std::to_string(Frame);
         std::string outputObjFilePathBase = "../userOutputData/vel_field_test";
         std::string velXFilePath = "../userOutputData/vel_field_test/velx_";
@@ -238,9 +204,20 @@ int main() {
         //posBuffer->outputObj(outputObjFilePath);
 
         velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
-        std::cout << velYFilePath << std::endl;
         velocityField->m_FieldY->GetVoxelBufferPtr()->outputObj(velYFilePath);
-        std::cout << velZFilePath << std::endl;
         velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);
+
+        // save pos buffer as obj file
+        std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_";
+
+#if CPU_VERSION
+        posOutputObjFilePathBase.append("cpu_");
+#elif GPU_VERSION
+        posOutputObjFilePathBase.append("gpu_");
+#endif
+        posOutputObjFilePathBase.append(frame);
+        posOutputObjFilePathBase.append(".obj");
+
+        posBuffer->outputObj(posOutputObjFilePathBase);
     }
 }

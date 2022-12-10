@@ -293,7 +293,7 @@ bind_output_list = []
 
 global_input_node_type_list = ["geometryvopglobal::2.0", "volumevopglobal"]
 global_output_node_type_list = ["geometryvopoutput", "volumevopoutput"] 
-buffer_param_name_list = ["P", "v", "force", "Cd", "N"]
+buffer_param_name_list = ["P", "v", "force", "Cd", "N", "age"]
 variable_type_dict = {"vector":"glm::vec3", "float":"float", "int":"int", "point":"glm::vec3", "string":"char", "struct": "struct", "normal": "glm::vec3", "stringa" : "char", "floata": "float", "struct_FloatRamp": "int"}
 
 
