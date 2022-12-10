@@ -298,10 +298,9 @@ replacementMap = {
 this_node = hou.pwd()
 
 # Load dag_son
-#geo = this_node.geometry()
-#json_str = geo.findGlobalAttrib("dag_json").strings()
-json_input = this_node.input(2)
-json_str = json_input.parm("/obj/geo1/json_file/content").eval()
+geo = this_node.geometry()
+json_str = geo.findGlobalAttrib("dag_json").strings()
+json_str = json_str[0]
 jsonObj = json.loads(json_str)
 
 # Read in the template

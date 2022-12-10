@@ -195,18 +195,6 @@ def bufferMallocGenerator(jsonObj):
 
 # Compute num of threads based on this buffer
 def refBufferNameGenerator(jsonObj):
-    # result = jsonObj["parallel_reference_name"]
-
-    # global_input = jsonObj["global_input"] 
-    # for input_node_key in global_input:
-    #     input_node = global_input[input_node_key]
-        
-    #     if ("volumevopglobal" in input_node_key) or ("geometryvopglobal" in input_node_key):
-    #         for input_port in input_node:
-    #             # check buffer type
-    #             if (input_port["variable_name"] == result) and (input_port["is_buffer"] == "True"):
-    #                 result += "buffer"
-    
     result = jsonObj["parallel_reference_name"]
 
     if jsonObj["parallel_reference"] == "volume":
@@ -279,12 +267,9 @@ replacementMap = {
 this_node = hou.pwd()
 
 # Load dag_son
-#geo = this_node.geometry()
-#json_str = geo.findGlobalAttrib("kernel_launch_json").strings()
-#json_str = json_str[0]
-#jsonObj = json.loads(json_str)
-json_input = this_node.input(2)
-json_str = json_input.parm("/obj/geo1/CUDA_JSON/content").eval()
+geo = this_node.geometry()
+json_str = geo.findGlobalAttrib("kernel_launch_json").strings()
+json_str = json_str[0]
 jsonObj = json.loads(json_str)
 
 # Read in the template
