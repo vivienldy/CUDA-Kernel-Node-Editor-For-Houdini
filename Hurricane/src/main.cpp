@@ -1,4 +1,5 @@
 #include "volumevop1.h"
+#include "ParticleAdvect.h"
 
 #include "BaseOperation.h"
 #include "CGGenerator.h"
@@ -77,21 +78,25 @@ int main() {
     int numPoints = 500;
     auto posBuffer = new CGBuffer<glm::vec3>("pos", numPoints, glm::vec3(0.f));
 
-    // dynamically create and initialize vbuffer
+    // dynamically create and initialize buffers
     auto velBuffer = new CGBuffer<glm::vec3>("vel", numPoints, glm::vec3(0.f));
+    auto ageBuffer = new CGBuffer<float>("age", numPoints, 0.f);
+    auto cdBuffer = new CGBuffer<glm::vec3>("age", numPoints, glm::vec3(0.f));
 
     // ===== create particle emitter
     // initilize data read from task json
     ParticleGenerator::RAWDesc desc;
     desc.direction = glm::vec3(0, 0, 1);
     desc.speed = 2;
-    desc.size = glm::vec2(2, 2);
-    desc.deltaX = 0.5;
-    desc.center = glm::vec3(0, 0.f, 0.f);
+    desc.size = glm::vec2(12, 12);
+    desc.deltaX = 0.27f;
+    desc.center = glm::vec3(-1.01811f, 0.539828f, 3.67439f);
 
     ParticleGenerator* particleGenerator = new ParticleGenerator(desc);
     particleGenerator->delegatePointBuffer(posBuffer);
+    particleGenerator->delegatePointBuffer(ageBuffer);
     particleGenerator->delegatePointBuffer(velBuffer);
+    particleGenerator->delegatePointBuffer(cdBuffer);
 
     // ====== create velocity field
     glm::vec3 pivot = glm::vec3(-1.17241f, 12.8777f, 1.88102f);
@@ -136,7 +141,6 @@ int main() {
     // ===== create vop CGGeometry input/OpInput
      // volumeVop_OpInput1: a velfield, a geometry bounding box
      // volumeVop1_OpInput2: a geometry bounding box
-
     CGAABB volumeVop_OpInput1_bbox = fieldX->GetAABB();
     CGGeometry* volumeVop1_OpInput1 = new CGGeometry(volumeVop_OpInput1_bbox, nullptr, nullptr, velocityField);
 
@@ -145,9 +149,13 @@ int main() {
     CGAABB volumeVop_OpInput2_bbox = CGAABB(aabb_min, aabb_max);
     CGGeometry* volumeVop1_OpInput2 = new CGGeometry(volumeVop_OpInput2_bbox, nullptr, nullptr, nullptr);
 
-    //CGGeometry particleAdvectVop_OpInput2; // a velocity field->velocityField
+    // particleAdvectVop_OpInput1: a volume for create color
+    // particleAdvectVop_OpInput2: a velocity field
+    CGGeometry* particleAdvectVop_OpInput1 = new CGGeometry(CGAABB(), nullptr, nullptr, velocityField);
+    // need a new volume here
+    CGGeometry* particleAdvectVop_OpInput2 = new CGGeometry(CGAABB(), nullptr, nullptr, velocityField);
 
-    // ===== load from task json
+     // ===== load from task json
     int startFrame = 0;
     int endFrame = 1;
     float FPS = 24.f;
@@ -161,7 +169,7 @@ int main() {
 
 #if CPU_VERSION
         // particle emitter
-       //particleGenerator->generateParticlesCPU();
+        particleGenerator->generateParticlesCPU();
 
         // create velocity field
         CodeGenerator::volumevop1(
@@ -179,9 +187,13 @@ int main() {
 #elif GPU_VERSION
         // particle emitter
         // first load pos buffer to device
-        //posBuffer->malloc();
-        //posBuffer->loadHostToDevice();
-        //particleGenerator->generateParticlesGPU();
+        posBuffer->malloc();
+        posBuffer->loadHostToDevice();
+        ageBuffer->malloc();
+        ageBuffer->loadHostToDevice();
+        cdBuffer->malloc();
+        cdBuffer->loadHostToDevice();
+        particleGenerator->generateParticlesGPU();
 
         CodeGenerator::CUDA::volumevop1(
             volumeVop1_input5,
@@ -191,6 +203,13 @@ int main() {
             volumeVop1_OpInput1,
             volumeVop1_OpInput2);
         velocityField->LoadToHost();
+
+        //CodeGenerator::ParticleAdvect(
+//    posBuffer, 
+//    TimeInc, 
+//    particleAdvectVop_OpInput2);
+
+        posBuffer->loadDeviceToHost();
 #endif
 
         // save pos buffer as obj file
