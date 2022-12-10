@@ -364,7 +364,7 @@ namespace CodeGenerator
 
         __host__ __device__ inline glm::vec3 createColor(glm::vec3 samplePos, float age, glm::vec3 cd,  CGGeometry::RAWData file, float timeInc)
         {
-            if (age == 0) {
+            if (age < timeInc) {
                 cd = Field::GenericCode::SampleValueVectorField<float>(samplePos, file.velFieldRAWData);
             }
             return cd;

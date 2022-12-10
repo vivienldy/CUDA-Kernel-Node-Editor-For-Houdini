@@ -8,13 +8,11 @@ void CodeGenerator::ParticleAdvect(glm::vec3 geo1_ParticleAdvect_offset_offset, 
    
 
     for(int index = 0; index < numThreads; ++index){
-        if (index == 782) {
-            std::cout << "---" << std::endl;
-        }
-        if (geo1_ParticleAdvect_geometryvopglobal1_OpInput2->m_VelField->m_FieldX->GetVoxelBufferPtr()->getSize() == 1026206379)
-        {
-            std::cout << "---" << std::endl;
-        }       
+
+        //if (geo1_ParticleAdvect_geometryvopglobal1_OpInput2->m_VelField->m_FieldX->GetVoxelBufferPtr()->getSize() == 1026206379)
+        //{
+        //    std::cout << "---" << std::endl;
+        //}       
         CodeGenerator::GenericCode::ParticleAdvect(geo1_ParticleAdvect_offset_offset, 
             geo1_ParticleAdvect_input3_input3, 
             geo1_ParticleAdvect_input2_input2, 
@@ -28,8 +26,8 @@ void CodeGenerator::ParticleAdvect(glm::vec3 geo1_ParticleAdvect_offset_offset, 
             index);
         //auto opinput2 = geo1_ParticleAdvect_geometryvopglobal1_OpInput2->GetGeometryRawData();
         //std::cout << *(opinput2.velFieldRAWData.VoxelDataX) << std::endl;
-        if (index == 782) {
-            std::cout << geo1_ParticleAdvect_geometryvopglobal1_OpInput2->m_VelField->m_FieldX->GetVoxelBufferPtr()->getSize() << std::endl;
-        }
+        //if (index == 782) {
+        //    std::cout << geo1_ParticleAdvect_geometryvopglobal1_OpInput2->m_VelField->m_FieldX->GetVoxelBufferPtr()->getSize() << std::endl;
+        //}
     }
 }

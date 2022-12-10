@@ -45,7 +45,6 @@ namespace CodeGenerator
 
 			// Generate by multiply1
 			glm::vec3 geo1_ParticleAdvect_multiply1_product = geo1_ParticleAdvect_floattovec1_vec * geo1_ParticleAdvect_input2_input2 * geo1_ParticleAdvect_vectofloat1_fval1;
-
 			// Generate by multiply2
 			float geo1_ParticleAdvect_multiply2_product = geo1_ParticleAdvect_vectofloat1_fval1 * geo1_ParticleAdvect_input3_input3;
 

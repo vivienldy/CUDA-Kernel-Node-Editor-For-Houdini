@@ -11,6 +11,7 @@
 #include <cuda.h>
 #include <cmath>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <glm/glm.hpp>
 #include <device_launch_parameters.h>
@@ -48,16 +49,12 @@ public:
 		: ParticleGenerator(name, RAWDesc()) {}
 
 	ParticleGenerator(std::string name, RAWDesc desc)
-		: name(name), m_Desc(desc)	{}
+		: name(name), m_Desc(desc) {}
 
 	std::string getName() { return name; }
 
 	void delegatePointBuffer(CGBufferBase* pointer) {
-		if (m_pointBuffers.find(pointer->getName()) != m_pointBuffers.end()) {
-			return;
-		}
-
-		m_pointBuffers[pointer->getName()] = pointer;
+		m_pointBuffers.insert(pointer);
 	}
 
 	void generateParticlesCPU() {
@@ -67,8 +64,8 @@ public:
 	void generateParticlesCPU(RAWDesc desc) {
 		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 		for (auto& pointBuffer : this->m_pointBuffers) {
-			auto bufferName = pointBuffer.first;
-			auto buffer = pointBuffer.second;
+			auto bufferName = pointBuffer->getName();
+			auto buffer = pointBuffer;
 
 			if (bufferName == "velocity") {
 				buffer->reallocationHost(appendSize);
@@ -84,9 +81,9 @@ public:
 				for (int k = 0; k < desc.speed; k++) {
 					for (int i = 0; i <= desc.size.y / desc.deltaX; i++) {
 						for (int j = 0; j <= desc.size.x / desc.deltaX; j++) {
-							velocity.push_back(desc.center - glm::vec3(desc.size, 0) / 2.f + glm::vec3(j * desc.deltaX, i * desc.deltaX, 0));
+							velocity.push_back(desc.center - glm::vec3(desc.size.x, 0, desc.size.y) / 2.f + glm::vec3(j * desc.deltaX, 0.f, i * desc.deltaX));
 							velocity.back() += k * desc.deltaX * desc.direction;
-						} 
+						}
 					}
 				}
 
@@ -107,7 +104,7 @@ public:
 				std::vector<float> ages(appendSize, 0.f);
 
 				std::vector<float>* ptr = (std::vector<float>*)buffer->getRawPtr();
-				ptr->insert(ptr->begin(), ages.begin(), ages.end());
+				ptr->insert(ptr->begin() + (((int)buffer->getSize()) - appendSize), ages.begin(), ages.end());
 			}
 		}
 	}
@@ -119,9 +116,9 @@ public:
 	void generateParticlesGPU(RAWDesc desc) {
 		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 
-		for (auto &pointBuffer: this->m_pointBuffers) {
-			auto bufferName = pointBuffer.first;
-			auto buffer = pointBuffer.second;
+		for (auto& pointBuffer : this->m_pointBuffers) {
+			auto bufferName = pointBuffer->getName();
+			auto buffer = pointBuffer;
 
 			if (bufferName == "velocity") {
 				buffer->reallocationDevice(appendSize);
@@ -163,7 +160,7 @@ public:
 private:
 	std::string name;
 
-	std::unordered_map<std::string, CGBufferBase*> m_pointBuffers;
+	std::unordered_set<CGBufferBase*> m_pointBuffers;
 
 	RAWDesc m_Desc;
 };

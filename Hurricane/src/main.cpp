@@ -5,8 +5,8 @@
 #include "CGGenerator.h"
 #include "CGGeometry.h"
 
-#define CPU_VERSION 1
-#define GPU_VERSION 0
+#define CPU_VERSION 0
+#define GPU_VERSION 1
 
 void colorCreateVolumeCreate() {
     glm::vec3 pivot = glm::vec3(-1.f, 0.6f, 3.7f);
@@ -23,7 +23,7 @@ int main() {
     // pbuffer for particle advect
     // load pbuffer from file
 
-    int numPoints = 500;
+    int numPoints = 2;
     auto posBuffer = new CGBuffer<glm::vec3>("position", numPoints, glm::vec3(0.f));
 
     // dynamically create and initialize buffers
@@ -36,7 +36,7 @@ int main() {
     // initilize data read from task json
     ParticleGenerator::RAWDesc desc;
     desc.direction = glm::vec3(0, 0, 1);
-    desc.speed = 2;
+    desc.speed = 1;
     desc.size = glm::vec2(12, 12);
     desc.deltaX = 0.27f;
     desc.center = glm::vec3(-1.f, 0.5f, 3.7f);
@@ -115,7 +115,7 @@ int main() {
 
      // ===== load from task json
     int startFrame = 0;
-    int endFrame = 1;
+    int endFrame = 100;
     float FPS = 24.f;
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
@@ -149,6 +149,7 @@ int main() {
             particleAdvectVop_OpInput1,
             particleAdvectVop_OpInput2,
             agePingpongBuffer);
+
         ageBuffer->copy(agePingpongBuffer);
 #elif GPU_VERSION
         // particle emitter
@@ -159,6 +160,9 @@ int main() {
         ageBuffer->loadHostToDevice();
         cdBuffer->malloc();
         cdBuffer->loadHostToDevice();
+        agePingpongBuffer->malloc();
+        agePingpongBuffer->loadHostToDevice();
+
         particleGenerator->generateParticlesGPU();
 
         CodeGenerator::CUDA::volumevop1(
@@ -170,16 +174,23 @@ int main() {
             volumeVop1_OpInput2);
         velocityField->LoadToHost();
 
-        //CodeGenerator::ParticleAdvect(
-//    posBuffer, 
-//    TimeInc, 
-//    particleAdvectVop_OpInput2);
+        CodeGenerator::CUDA::ParticleAdvect(
+            particleAdvectVop_offset,
+            particleAdvectVop_input3,
+            particleAdvectVop_input2,
+            posBuffer,
+            ageBuffer,
+            cdBuffer,
+            TimeInc,
+            particleAdvectVop_OpInput1,
+            particleAdvectVop_OpInput2,
+            agePingpongBuffer);
 
         posBuffer->loadDeviceToHost();
 #endif
 
         // save vel_field buffer as obj file
-        std::string frame = std::to_string(Frame);
+        std::string frame = std::to_string(Frame+1);
         std::string outputObjFilePathBase = "../userOutputData/vel_field_test";
         std::string velXFilePath = "../userOutputData/vel_field_test/velx_";
         std::string velYFilePath = "../userOutputData/vel_field_test/vely_";
@@ -203,9 +214,9 @@ int main() {
 
         //posBuffer->outputObj(outputObjFilePath);
 
-        velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
+ /*       velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
         velocityField->m_FieldY->GetVoxelBufferPtr()->outputObj(velYFilePath);
-        velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);
+        velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);*/
 
         // save pos buffer as obj file
         std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_";
@@ -219,5 +230,7 @@ int main() {
         posOutputObjFilePathBase.append(".obj");
 
         posBuffer->outputObj(posOutputObjFilePathBase);
+        std::cout << "-------- frame: "  << frame << std::endl;
+
     }
 }
