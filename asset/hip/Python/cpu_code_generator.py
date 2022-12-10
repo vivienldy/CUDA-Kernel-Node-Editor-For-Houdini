@@ -62,7 +62,7 @@ def parmListGenerator(jsonObj):
                     result += "CGBuffer<" + output_port["data_type"] + ">* " + output_port["variable_name"] + "buffer" + ", "
         else:
             for output_port in output_node:
-                result += "CGBuffer<" + input_port["data_type"] + ">* "  + output_port["variable_name"] + "_buffer"  + ", "
+                result += "CGBuffer<" + output_port["data_type"] + ">* "  + output_port["variable_name"] + "_buffer"  + ", "
 
     return result[:-2]
   
