@@ -119,15 +119,6 @@ def getNumThreadGenerator(jsonObj):
     else:
         result += "buffer->getSize();"
 
-    # global_input = jsonObj["global_input"] 
-    # for input_node_key in global_input:
-    #     input_node = global_input[input_node_key]
-        
-    #     if ("volumevopglobal" in input_node_key) or ("geometryvopglobal" in input_node_key):
-    #         for input_port in input_node:
-    #             # check buffer type
-    #             if (input_port["variable_name"] == result) and (input_port["is_buffer"] == "True"):
-    #                 result += "buffer"
     return result
 
 # ----- Code Segment Map -----
@@ -144,14 +135,10 @@ replacementMap = {
 
 this_node = hou.pwd()  
 # Load cpu_json
-# geo = this_node.geometry()
-# json_str = geo.findGlobalAttrib("cpu_json").strings()
-# json_str = json_str[0]
-# jsonObj = json.loads(json_str)
-json_input = this_node.input(2)
-json_str = json_input.parm("/obj/geo1/CPU_JSON/content").eval()
+geo = this_node.geometry()
+json_str = geo.findGlobalAttrib("cpu_json").strings()
+json_str = json_str[0]
 jsonObj = json.loads(json_str)
-
 
 # Read in the template
 with open('./Template/CPUTemplate_h.h', 'r') as file :
