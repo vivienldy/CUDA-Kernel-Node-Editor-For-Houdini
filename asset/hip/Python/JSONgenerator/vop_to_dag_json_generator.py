@@ -121,7 +121,7 @@ def create_raw_output_json_pair(output_names, output_data_types, node_path):
             
 
 # ========= global value
-general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway", "floattovec", "clamp"]
+general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway", "floattovec", "clamp", "volumesamplefile"]
 signature_parm_suffix_dict = {"default": ["1", "2", "3"], "v":["_v1", "_v2", "_v3"], "p":["_p1", "_p2", "_p3"], "c":["_cr", "_cg", "_cb"], "n":["_n1", "_n2", "_n3"]} # uv, un, up, uc...
 
 # get the current python node
