@@ -11,6 +11,7 @@
 #include <cuda.h>
 #include <cmath>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <glm/glm.hpp>
 #include <device_launch_parameters.h>
@@ -53,11 +54,7 @@ public:
 	std::string getName() { return name; }
 
 	void delegatePointBuffer(CGBufferBase* pointer) {
-		if (m_pointBuffers.find(pointer->getName()) != m_pointBuffers.end()) {
-			return;
-		}
-
-		m_pointBuffers[pointer->getName()] = pointer;
+		m_pointBuffers.insert(pointer);
 	}
 
 	void generateParticlesCPU() {
@@ -67,8 +64,8 @@ public:
 	void generateParticlesCPU(RAWDesc desc) {
 		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 		for (auto& pointBuffer : this->m_pointBuffers) {
-			auto bufferName = pointBuffer.first;
-			auto buffer = pointBuffer.second;
+			auto bufferName = pointBuffer->getName();
+			auto buffer = pointBuffer;
 
 			if (bufferName == "velocity") {
 				buffer->reallocationHost(appendSize);
@@ -120,8 +117,8 @@ public:
 		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 
 		for (auto &pointBuffer: this->m_pointBuffers) {
-			auto bufferName = pointBuffer.first;
-			auto buffer = pointBuffer.second;
+			auto bufferName = pointBuffer->getName();
+			auto buffer = pointBuffer;
 
 			if (bufferName == "velocity") {
 				buffer->reallocationDevice(appendSize);
@@ -163,7 +160,7 @@ public:
 private:
 	std::string name;
 
-	std::unordered_map<std::string, CGBufferBase*> m_pointBuffers;
+	std::unordered_set<CGBufferBase*> m_pointBuffers;
 
 	RAWDesc m_Desc;
 };
