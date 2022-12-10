@@ -9,22 +9,6 @@ vop = this_node.input(1)
 
 kernel_launch_json_dict = dict()
 
-# "//comment" key value
-comment_dict = { \
-        "#OUT_FILE_NAME#": "out_filename", \
-        "#KERNEL_NAME#" : "particleAdvect", \
-        "#KERNEL_PARM_DECLARE_LIST#" : ["global_input", "global_output"], \
-        "#FUNC_NAME#" : "func_name", \
-        "#SHARE_CODE_PARM_INPUT_LIST#" : ["global_input", "global_output"], \
-        "#KERNEL_LAUNCH_NAME#" : "kernel_launch_name", \
-        "#KERNEL_LAUNCH_PARM_DECLARE_LIST#" : ["global_input", "global_output"], \
-        "#BUFFER_MALLOC#": ["global_input", "global_output"], \
-        "#REF_BUFFER_NAME#": "ref_buffer_name", \
-        "#KERNEL_PARM_INPUT_LIST#" : ["global_input", "global_output"], \
-        "#KERNEL_LAUNCH_ERROR_MSG#": "error_msg" \
-        } 
-kernel_launch_json_dict["//comment"] = comment_dict
-
 # "out_filename" key value
 kernel_launch_json_dict["out_filename"] = vop.name().replace("_", "")
 

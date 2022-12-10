@@ -315,6 +315,10 @@ for dag_node in sorted_dag_nodes_list:
                     print("*******ERROR when find data_type for !!! " + port_dict["data_type"] +  " !!!in variable_type_dict!!!")
                 port_dict["variable_name"] = port_unique_name
                 port_dict["port_name"] = output.port_name
+                if output.port_name.find("OpInput") != -1:
+                    port_dict["is_OpInput"] = "True"
+                else:
+                    port_dict["is_OpInput"] = "False"
                 global_input_list.append(port_dict)
         global_input_json_dict[dag_node.node_name] = global_input_list
         
@@ -446,29 +450,3 @@ json_str = json.dumps(dag_json_dict)
 geo = this_node.geometry()
 geo.addAttrib(hou.attribType.Global, "dag_json", "")
 geo.setGlobalAttribValue("dag_json", json_str)
-
-
-
-"""
- "threadIdx":{
-            "method_name":"inlineCode",
-            "content":"int geo1_volumevop1_threadIdx_idx = idx;"
-        }
-"""
-
-"""
-"ToVoxelCenter":{
-    "method_name":"ToVoxelCenter",
-    "input":[
-        {
-            "local_input_name":"geo1_volumevop1_threadIdx_idx"
-        }
-    ],
-    "output":[
-        {
-            "data_type":"glm::vec3",
-            "local_output_name":"geo1_volumevop1_ToVoxelCenter_p"
-        }
-    ]
-},
-"""
