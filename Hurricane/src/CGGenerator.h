@@ -12,6 +12,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <unordered_set>
+#include <unordered_set>
 
 #include <glm/glm.hpp>
 #include <device_launch_parameters.h>
@@ -55,6 +56,7 @@ public:
 
 	void delegatePointBuffer(CGBufferBase* pointer) {
 		m_pointBuffers.insert(pointer);
+		m_pointBuffers.insert(pointer);
 	}
 
 	void generateParticlesCPU() {
@@ -64,6 +66,8 @@ public:
 	void generateParticlesCPU(RAWDesc desc) {
 		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 		for (auto& pointBuffer : this->m_pointBuffers) {
+			auto bufferName = pointBuffer->getName();
+			auto buffer = pointBuffer;
 			auto bufferName = pointBuffer->getName();
 			auto buffer = pointBuffer;
 
@@ -160,6 +164,7 @@ public:
 private:
 	std::string name;
 
+	std::unordered_set<CGBufferBase*> m_pointBuffers;
 	std::unordered_set<CGBufferBase*> m_pointBuffers;
 
 	RAWDesc m_Desc;
