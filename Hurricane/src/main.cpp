@@ -120,6 +120,17 @@ int main() {
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
 
+    // particle emitter
+    // first load pos buffer to device
+    posBuffer->malloc();
+    posBuffer->loadHostToDevice();
+    ageBuffer->malloc();
+    ageBuffer->loadHostToDevice();
+    cdBuffer->malloc();
+    cdBuffer->loadHostToDevice();
+    agePingpongBuffer->malloc();
+    agePingpongBuffer->loadHostToDevice();
+
     for (int i = startFrame; i < endFrame; ++i) {
         //hard code var block
         float Time = i / FPS;
@@ -152,18 +163,10 @@ int main() {
 
         ageBuffer->copy(agePingpongBuffer);
 #elif GPU_VERSION
-        // particle emitter
-        // first load pos buffer to device
-        posBuffer->malloc();
-        posBuffer->loadHostToDevice();
-        ageBuffer->malloc();
-        ageBuffer->loadHostToDevice();
-        cdBuffer->malloc();
-        cdBuffer->loadHostToDevice();
-        agePingpongBuffer->malloc();
-        agePingpongBuffer->loadHostToDevice();
-
+        std::cout << "generate\n";
         particleGenerator->generateParticlesGPU();
+
+        std::cout << "generate done\n";
 
         CodeGenerator::CUDA::volumevop1(
             volumeVop1_input5,
@@ -172,7 +175,12 @@ int main() {
             volumeVop1_input2,
             volumeVop1_OpInput1,
             volumeVop1_OpInput2);
+
+        std::cout << "C\n";
+
         velocityField->LoadToHost();
+
+        std::cout << "D\n";
 
         CodeGenerator::CUDA::ParticleAdvect(
             particleAdvectVop_offset,
@@ -186,7 +194,11 @@ int main() {
             particleAdvectVop_OpInput2,
             agePingpongBuffer);
 
+        std::cout << "E\n";
+
         posBuffer->loadDeviceToHost();
+
+        std::cout << "F\n";
 #endif
 
         // save vel_field buffer as obj file
@@ -229,6 +241,7 @@ int main() {
         posOutputObjFilePathBase.append(frame);
         posOutputObjFilePathBase.append(".obj");
 
+        std::cout << "Output\n";
         posBuffer->outputObj(posOutputObjFilePathBase);
         std::cout << "-------- frame: "  << frame << std::endl;
 

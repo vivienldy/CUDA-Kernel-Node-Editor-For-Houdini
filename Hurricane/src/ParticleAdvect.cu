@@ -17,23 +17,23 @@ void CodeGenerator::CUDA::ParticleAdvect (
     int blockSize)
 {
     // Buffer malloc
-    geo1_ParticleAdvect_geometryvopglobal1_Pbuffer->malloc();
-geo1_ParticleAdvect_geometryvopglobal1_Pbuffer->loadHostToDevice();
-
-geo1_ParticleAdvect_geometryvopglobal1_agebuffer->malloc();
-geo1_ParticleAdvect_geometryvopglobal1_agebuffer->loadHostToDevice();
-
-geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer->malloc();
-geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer->loadHostToDevice();
-
-__geo1_ParticleAdvect_add1_sum_debug_buffer->malloc();
-__geo1_ParticleAdvect_add1_sum_debug_buffer->loadHostToDevice();
-
-geo1_ParticleAdvect_geometryvopglobal1_OpInput1->DeviceMalloc();
-geo1_ParticleAdvect_geometryvopglobal1_OpInput1->LoadToDevice();
-
-geo1_ParticleAdvect_geometryvopglobal1_OpInput2->DeviceMalloc();
-geo1_ParticleAdvect_geometryvopglobal1_OpInput2->LoadToDevice();
+//    geo1_ParticleAdvect_geometryvopglobal1_Pbuffer->malloc();
+//geo1_ParticleAdvect_geometryvopglobal1_Pbuffer->loadHostToDevice();
+//
+//geo1_ParticleAdvect_geometryvopglobal1_agebuffer->malloc();
+//geo1_ParticleAdvect_geometryvopglobal1_agebuffer->loadHostToDevice();
+//
+//geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer->malloc();
+//geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer->loadHostToDevice();
+//
+//__geo1_ParticleAdvect_add1_sum_debug_buffer->malloc();
+//__geo1_ParticleAdvect_add1_sum_debug_buffer->loadHostToDevice();
+//
+//geo1_ParticleAdvect_geometryvopglobal1_OpInput1->DeviceMalloc();
+//geo1_ParticleAdvect_geometryvopglobal1_OpInput1->LoadToDevice();
+//
+//geo1_ParticleAdvect_geometryvopglobal1_OpInput2->DeviceMalloc();
+//geo1_ParticleAdvect_geometryvopglobal1_OpInput2->LoadToDevice();
 
 
 

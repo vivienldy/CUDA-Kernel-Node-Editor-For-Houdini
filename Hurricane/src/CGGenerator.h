@@ -68,8 +68,6 @@ public:
 		for (auto& pointBuffer : this->m_pointBuffers) {
 			auto bufferName = pointBuffer->getName();
 			auto buffer = pointBuffer;
-			auto bufferName = pointBuffer->getName();
-			auto buffer = pointBuffer;
 
 			if (bufferName == "velocity") {
 				buffer->reallocationHost(appendSize);
@@ -164,7 +162,6 @@ public:
 private:
 	std::string name;
 
-	std::unordered_set<CGBufferBase*> m_pointBuffers;
 	std::unordered_set<CGBufferBase*> m_pointBuffers;
 
 	RAWDesc m_Desc;
