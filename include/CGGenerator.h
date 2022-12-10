@@ -65,7 +65,7 @@ public:
 	}
 
 	void generateParticlesCPU(RAWDesc desc) {
-		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed);
+		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 		for (auto& pointBuffer : this->m_pointBuffers) {
 			auto bufferName = pointBuffer.first;
 			auto buffer = pointBuffer.second;
@@ -85,13 +85,29 @@ public:
 					for (int i = 0; i <= desc.size.y / desc.deltaX; i++) {
 						for (int j = 0; j <= desc.size.x / desc.deltaX; j++) {
 							velocity.push_back(desc.center - glm::vec3(desc.size, 0) / 2.f + glm::vec3(j * desc.deltaX, i * desc.deltaX, 0));
-							velocity.back() += k / desc.deltaX * desc.direction;
+							velocity.back() += k * desc.deltaX * desc.direction;
 						} 
 					}
 				}
 
 				std::vector<glm::vec3>* ptr = (std::vector<glm::vec3>*)buffer->getRawPtr();
 				std::copy(velocity.begin(), velocity.end(), ptr->begin() + (((int)buffer->getSize()) - appendSize));
+			}
+			else if (bufferName == "color") {
+				buffer->reallocationHost(appendSize);
+
+				std::vector<glm::vec3> colors(appendSize, glm::vec3(0.f));
+
+				std::vector<glm::vec3>* ptr = (std::vector<glm::vec3>*)buffer->getRawPtr();
+				std::copy(colors.begin(), colors.end(), ptr->begin() + (((int)buffer->getSize()) - appendSize));
+			}
+			else if (bufferName == "age") {
+				buffer->reallocationHost(appendSize, false);
+
+				std::vector<float> ages(appendSize, 0.f);
+
+				std::vector<float>* ptr = (std::vector<float>*)buffer->getRawPtr();
+				ptr->insert(ptr->begin(), ages.begin(), ages.end());
 			}
 		}
 	}
@@ -101,7 +117,7 @@ public:
 	}
 
 	void generateParticlesGPU(RAWDesc desc) {
-		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed);
+		int appendSize = int(desc.size.x / desc.deltaX + 1) * int(desc.size.y / desc.deltaX + 1) * int(desc.speed / desc.deltaX);
 
 		for (auto &pointBuffer: this->m_pointBuffers) {
 			auto bufferName = pointBuffer.first;
@@ -117,15 +133,29 @@ public:
 				buffer->reallocationDevice(appendSize);
 
 				std::vector<glm::vec3> velocity;
-				for (int k = 0; k < desc.speed; k++) {
+				for (int k = 0; k < desc.speed / desc.deltaX; k++) {
 					for (int i = 0; i <= desc.size.y / desc.deltaX; i++) {
 						for (int j = 0; j <= desc.size.x / desc.deltaX; j++) {
 							velocity.push_back(desc.center - glm::vec3(desc.size, 0) / 2.f + glm::vec3(j * desc.deltaX, i * desc.deltaX, 0));
-							velocity.back() += k / desc.deltaX * desc.direction;
+							velocity.back() += k * desc.deltaX * desc.direction;
 						}
 					}
 				}
 				cudaMemcpy(((glm::vec3*)buffer->getDevicePtr()) + ((int)buffer->getSize() - appendSize), velocity.data(), appendSize * buffer->typeSize(), cudaMemcpyHostToDevice);
+			}
+			else if (bufferName == "color") {
+				buffer->reallocationDevice(appendSize);
+
+				std::vector<glm::vec3> colors(appendSize, glm::vec3(0.f));
+
+				cudaMemcpy(((glm::vec3*)buffer->getDevicePtr()) + ((int)buffer->getSize() - appendSize), colors.data(), appendSize * buffer->typeSize(), cudaMemcpyHostToDevice);
+			}
+			else if (bufferName == "age") {
+				buffer->reallocationDevice(appendSize);
+
+				std::vector<float> ages(appendSize, 0.f);
+
+				cudaMemcpy(((glm::vec3*)buffer->getDevicePtr()) + ((int)buffer->getSize() - appendSize), ages.data(), appendSize * buffer->typeSize(), cudaMemcpyHostToDevice);
 			}
 		}
 	}
