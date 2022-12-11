@@ -7,7 +7,8 @@ namespace CodeGenerator
 { 
     namespace GenericCode
     {
-        __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos,  glm::vec3 freq, float amp, int turb) {
+        __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos,  glm::vec3 freq, float amp, int turb) 
+        {
             return glm::vec3(1.f);
         }
 

@@ -62,7 +62,7 @@ find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 
 set(headers
-    src/CGBuffer.h
+    ../include/CGBuffer.h
     src/CGField.h
     src/BaseOperation.h
     src/SimpleParticle.cuh
@@ -74,6 +74,8 @@ set(sources
     src/main.cpp
     src/SimpleParticle.cpp
     src/SimpleParticle.cu
+    src/XNoise.cpp
+    src/XNoise.GPU.cu
     )
 
 list(SORT headers)

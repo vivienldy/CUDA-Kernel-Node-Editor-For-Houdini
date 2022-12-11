@@ -21,12 +21,6 @@ void checkCUDAError(const char* msg, int line = -1) {
     }
 }
 
-
-glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
-{
-    return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
-}
-
 __global__ void CodeGenerator::CUDAKernel::particleAdvect (
     int geo1_solver1_d_s_pointvop2__DEBUG_turb_turb,
     float geo1_solver1_d_s_pointvop2__DEBUG_amp_amp,

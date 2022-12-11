@@ -15,6 +15,48 @@
 #include <device_launch_parameters.h>
 #include <cuda_runtime.h>
 
+
+#define CG_GET_DEVICE_LAST_ERROR {\
+		cudaError_t cudaStatus = cudaGetLastError();	\
+		if (cudaStatus != cudaSuccess) {				\
+			std::cout<<"Kernel launch failed Code: "<<cudaGetErrorString(cudaStatus)<< __FILE__ << " " << __LINE__ << std::endl;\
+		}else{\
+			std::cout<<"Kernel launch succ"<< __FILE__ <<"@"<<__LINE__<<std::endl;\
+		}\
+	}
+
+#define CG_SHARE_FUNC inline __host__ __device__
+typedef unsigned char uchar;
+
+CG_SHARE_FUNC glm::vec3 MakeVector3(float x, float y, float z)
+{
+	glm::vec3 vec;
+	vec.x = x; vec.y = y; vec.z = z;
+	return vec;
+}
+
+CG_SHARE_FUNC glm::vec3 MakeVector3()
+{
+	return MakeVector3(0.0f, 0.0f, 0.0f);
+}
+
+CG_SHARE_FUNC glm::vec4 MakeVector4(glm::vec3 v3, float w)
+{
+	glm::vec4 vec;
+	vec.x = v3.x; vec.y = v3.y; vec.z = v3.z; vec.w = w;
+	return vec;
+}
+
+CG_SHARE_FUNC glm::vec4 MakeVector4()
+{
+	glm::vec4 vec;
+	vec.x = 0.0f; vec.y = 0.0f; vec.z = 0.0f; vec.w = 0.0f;
+	return vec;
+}
+
+#define FOR_I(n)			for (int i = 0; i < n; ++i)
+
+
 class CGBufferBase {
 protected:
 	uint32_t m_bufferSize;
@@ -42,6 +84,7 @@ public:
 	{
 
 	}
+
 
 	virtual uint32_t typeSize() = 0;
 	//virtual void setDevicePtr(void* rawPtr) = 0;
@@ -124,6 +167,18 @@ public:
 		m_rawPtr = &m_data;
 	}
 
+	T* getDataRaw()
+	{
+		return m_data.data();
+	}
+
+	template<typename S>
+	void CopyRaw(S* other, int size)
+	{
+		m_data.resize(size);
+		std::memcpy(m_data.data(), other, size * sizeof(T));
+	}
+
 	void initializeFromFile(std::string filename) {
 		char* fname = (char*)filename.c_str();
 
@@ -172,6 +227,12 @@ public:
 
 		m_data = *(std::vector<T>*)m_rawPtr;
 		m_bufferSize = m_data.size();
+	}
+
+	void printData()
+	{
+		for (size_t i = 0; i < m_data.size(); i++)
+			std::cout<< m_data[i] << std::endl;
 	}
 
 	void setToZero() {
@@ -229,12 +290,20 @@ public:
 	}
 
 	bool malloc() {
+		if (isMalloc)
+			return false;
 		isMalloc = true;
 		cudaMalloc((void**)&m_devicePtr, m_bufferSize * sizeof(T));
 
 		//m_rawPtr = m_devicePtr;
 
 		return true;
+	}
+
+	template<typename S>
+	S* GetDataRawDevice()
+	{
+		return (S*)m_devicePtr;
 	}
 
 	bool loadHostToDevice() {
@@ -368,6 +437,27 @@ CGBufferBase* CGBuffer<T>::loadFromFile(std::string filename) {
 	}
 
 	return instance;
+}
+
+
+typedef CGBuffer<glm::vec3> CGBufferV3;
+typedef CGBuffer<int>		CGBufferI;
+typedef CGBuffer<float>		CGBufferF;
+typedef CGBuffer<void>		CGBufferRaw;
+
+inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec3)
+{
+	os << "v  " << vec3.x << " " << vec3.y << " " << vec3.z;
+	return os;
+
+
+}
+
+
+
+inline glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
+{
+	return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
 }
 
 //int CGBufferBase::id = 0;

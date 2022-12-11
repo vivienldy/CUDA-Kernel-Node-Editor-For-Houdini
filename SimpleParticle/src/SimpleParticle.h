@@ -2,7 +2,7 @@
 // 声明 CodeGenerator::CUDA::ParticleAdvect() // GPU Kernel Launch
 // 实现main函数
 
-#include "CGBuffer.h"
+#include "../../include/CGBuffer.h"
 #include "SimpleParticle.GenericCode.h"
 
 #define CPU_VERSION 0
