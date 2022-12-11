@@ -303,8 +303,20 @@ namespace detail
 		GLM_FUNC_DECL tvec4<T, P> & operator-=(tvec4<U, P> const & v);
 		template <typename U>
 		GLM_FUNC_DECL tvec4<T, P> & operator*=(U scalar);
+
+
 		template <typename U>
 		GLM_FUNC_DECL tvec4<T, P> & operator*=(tvec1<U, P> const & v);
+
+		template <typename U>
+		GLM_FUNC_DECL tvec4<T, P>& operator*=(tvec3<U, P> const& v)
+		{
+			this->x *= v.x;
+			this->y *= v.y;
+			this->z *= v.z;
+			return *this;
+		}
+
 		template <typename U>
 		GLM_FUNC_DECL tvec4<T, P> & operator*=(tvec4<U, P> const & v);
 		template <typename U>

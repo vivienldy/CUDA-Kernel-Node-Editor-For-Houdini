@@ -13,7 +13,7 @@
 #include <cuda_runtime.h>
 #include <glm/glm.hpp>
 
-#include "CGBuffer.h"
+#include "../../include/CGBuffer.h"
 
 
 struct CGField3DInfo

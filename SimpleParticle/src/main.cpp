@@ -1,9 +1,52 @@
 // 实现 CodeGenerator::ParticleAdvect() // CPU FORLOOP
 
 #include "SimpleParticle.h"
+#include "../../include/xnoise/XNoise.h"
+
+int curlNoiseTest()
+{
+    std::string filename = "../userInputData/posRawBufferData.txt";
+    auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer =
+        dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(filename));
+
+    CurlNoise4DVector(
+        MakeDefaultCurlNoise(),
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer,
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer,
+        XNoiseDataManager::GetInstance()->GetXNoiseData(), 0.0f, 0.0416);
+
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->printData();
+    return -1;
+}
+
+int curlNoiseTestGPU()
+{
+    std::string filename = "../userInputData/posRawBufferData.txt";
+    auto geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer =
+        dynamic_cast<CGBuffer<glm::vec3>*>(CGBuffer<float>::loadFromFile(filename));
+
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->malloc();
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->loadHostToDevice();
+
+    auto noiseParam = MakeDefaultCurlNoiseDevice();
+    CUDA::CurlNoise4DVector(
+        noiseParam,
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer,
+        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer,
+        XNoiseDataManager::GetInstance()->GetXNoiseDataDevice(), 0.0f, 0.0416);
+
+
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->loadDeviceToHost();
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->printData();
+    return -1;
+}
+
 
 int main() // ? 还是main函数应该是现在单独的main.cpp 里
 {
+    //curlNoiseTest();
+    curlNoiseTestGPU();
+    return -1;
     // ===== create input buffer
     // pbuffer, vbuffer, timeInc is defined inside for loop
     // load pbuffer from file

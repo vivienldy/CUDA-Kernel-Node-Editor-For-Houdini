@@ -16,6 +16,9 @@
 #include <cuda_runtime.h>
 
 
+
+
+
 enum DataType {
 	VEC3,
 	FLOAT
@@ -31,11 +34,15 @@ public:
 	CGBufferBase()
 		: CGBufferBase(0, "Autonomy")
 	{
+		isMalloc = false;
 
 	}
 
 	CGBufferBase(int size)
-		: CGBufferBase(size, "Autonomy") {}
+		: CGBufferBase(size, "Autonomy") 
+	{
+		isMalloc = false;
+	}
 
 	CGBufferBase(int size, std::string name)
 		: m_bufferSize(size), bufferNmae(name), isMalloc(false)
@@ -77,7 +84,6 @@ public:
 		: CGBufferBase(),
 		m_devicePtr(nullptr)
 	{
-
 	}
 
 	CGBuffer(int size, T value)
@@ -117,6 +123,12 @@ public:
 		return object;
 	}
 
+	void printData()
+	{
+		for (size_t i = 0; i < m_data.size(); i++)
+			std::cout << "i:" << i << m_data[i] << std::endl;
+	}
+
 	T* getRawData() {
 		return m_data.data();
 	}
@@ -139,6 +151,8 @@ public:
 	}
 
 	bool malloc() {
+		if (isMalloc)
+			return false;
 		isMalloc = true;
 		cudaMalloc((void**)&m_devicePtr, m_bufferSize * sizeof(T));
 		return true;
@@ -263,6 +277,13 @@ CGBufferBase* CGBuffer<T>::loadFromFile(std::string filename) {
 	}
 
 	return instance;
+}
+
+
+inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec3)
+{
+	os << " v  " << vec3.x << "," << vec3.y << "," << vec3.z;
+	return os;
 }
 
 ///**
