@@ -62,6 +62,7 @@ find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 
 set(headers
+    src/CGUtility.h
     src/CGBuffer.h
     src/CGField.h
     src/CGGenerator.h
@@ -71,12 +72,17 @@ set(headers
     src/volumevop1.cuh
     src/volumevop1.GenericCode.h
     src/volumevop1.h
+    src/ParticleAdvect.cuh
+    src/ParticleAdvect.GenericCode.h
+    src/ParticleAdvect.h
     )
 
 set(sources
     src/main.cpp
     src/volumevop1.cpp
     src/volumevop1.cu
+    src/ParticleAdvect.cpp
+    src/ParticleAdvect.cu
     )
 
 list(SORT headers)

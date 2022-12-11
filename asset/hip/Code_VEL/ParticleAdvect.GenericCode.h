@@ -5,11 +5,12 @@ namespace CodeGenerator
 { 
 	namespace GenericCode 
  	{ 
-        __host__ __device__ inline void ParticleAdvect(glm::vec3 geo1_ParticleAdvect_offset_offset, float geo1_ParticleAdvect_input3_input3, float geo1_ParticleAdvect_input2_input2, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Pbuffer, float geo1_ParticleAdvect_geometryvopglobal1_age, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer, float geo1_ParticleAdvect_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput1, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput2, float* __geo1_ParticleAdvect_add1_sum_debug_buffer, int idx)
+        __host__ __device__ inline void ParticleAdvect(glm::vec3 geo1_ParticleAdvect_offset_offset, float geo1_ParticleAdvect_input3_input3, float geo1_ParticleAdvect_input2_input2, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Pbuffer, float* geo1_ParticleAdvect_geometryvopglobal1_agebuffer, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer, float geo1_ParticleAdvect_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput1, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput2, float* __geo1_ParticleAdvect_add1_sum_debug_buffer, int idx)
         {
             // Data Load 
             // Geometry Global Input
 glm::vec3 geo1_ParticleAdvect_geometryvopglobal1_P = geo1_ParticleAdvect_geometryvopglobal1_Pbuffer[idx];
+float geo1_ParticleAdvect_geometryvopglobal1_age = geo1_ParticleAdvect_geometryvopglobal1_agebuffer[idx];
 glm::vec3 geo1_ParticleAdvect_geometryvopglobal1_Cd = geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer[idx];
 
 

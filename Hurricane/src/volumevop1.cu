@@ -3,28 +3,7 @@
 
 #include "CGGeometry.h"
 
-#define checkCUDAErrorWithLine(msg) checkCUDAError(msg, __LINE__)
-/**
- * Check for CUDA errors; print and exit if there was a problem.
- */
-void checkCUDAError(const char *msg, int line = -1)
-{
-    cudaError_t err = cudaGetLastError();
-    if (cudaSuccess != err)
-    {
-        if (line >= 0)
-        {
-            fprintf(stderr, "Line %d: ", line);
-        }
-        fprintf(stderr, "Cuda error: %s: %s.\n", msg, cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-}
-
-glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
-{
-    return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
-}
+#include "CGUtility.h"
 
 __global__ void CodeGenerator::CUDAKernel::volumevop1(
     float geo1_volumevop1_input8_input5, 
@@ -82,7 +61,7 @@ void CodeGenerator::CUDA::volumevop1(
         geo1_volumevop1_volumevopglobal1_OpInput2->GetGeometryRawDataDevice(),
         numOfThreads);
 
-    checkCUDAErrorWithLine("volumevop1 error");
+    //checkCUDAErrorWithLine("volumevop1 error");
 
     cudaDeviceSynchronize();
 }

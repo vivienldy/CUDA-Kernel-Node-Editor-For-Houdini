@@ -235,10 +235,10 @@ namespace CodeGenerator
     namespace GenericCode
     {
         // ----- helper function
-        //__host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos, glm::vec3 freq, glm::vec3 offset, glm::vec3 nml, string type, string geo, int turb, int bounce, float amp, float rough, float atten, float distance, float radius, float h)
-        //{
-        //    return glm::vec3(1.f);
-        //}
+        __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos/*, glm::vec3 freq, glm::vec3 offset, glm::vec3 nml, string type, string geo, int turb, int bounce, float amp, float rough, float atten, float distance, float radius, float h*/)
+        {
+            return glm::vec3(1.f);
+        }
 
         __host__ __device__ inline float fit(float x, float omin, float omax, float nmin, float nmax)
         {
@@ -344,6 +344,30 @@ namespace CodeGenerator
         __host__ __device__ inline void SetVoxelValueVector3(int idx, glm::vec3 value, CGGeometry::RAWData file)
         {
             Field::GenericCode::SetValueVector3<float>(idx, value, file.velFieldRAWData);
+        }
+
+        __host__ __device__ inline float volumesamplefile(CGGeometry::RAWData file, int primId, glm::vec3 samplePos)
+        {
+            CGField3D<float>::RAWData scalarFields[3];
+            Field::GenericCode::VectorFieldDataSplit<float>(file.velFieldRAWData, scalarFields);
+            if (primId == 0) {
+                return Field::GenericCode::SampleValueScalarField<float>(samplePos, scalarFields[0].VoxelData, scalarFields[0].FieldInfo);
+            }
+            else if (primId == 1) {
+                return Field::GenericCode::SampleValueScalarField<float>(samplePos, scalarFields[1].VoxelData, scalarFields[1].FieldInfo);
+            }
+            else if (primId == 2) {
+                return Field::GenericCode::SampleValueScalarField<float>(samplePos, scalarFields[2].VoxelData, scalarFields[2].FieldInfo);
+            }
+            return 0.f;
+        }
+
+        __host__ __device__ inline glm::vec3 createColor(glm::vec3 samplePos, float age, glm::vec3 cd,  CGGeometry::RAWData file, float timeInc)
+        {
+            if (age < timeInc) {
+                cd = Field::GenericCode::SampleValueVectorField<float>(samplePos, file.velFieldRAWData);
+            }
+            return cd;
         }
     } 
 }

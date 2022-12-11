@@ -31,11 +31,13 @@ public:
 	CGBufferBase()
 		: CGBufferBase(0, "Autonomy: " + std::to_string(0))
 	{
-
+		isMalloc = false;
 	}
 
 	CGBufferBase(int size)
-		: CGBufferBase(size, "Autonomy: " + std::to_string(0)) {}
+		: CGBufferBase(size, "Autonomy: " + std::to_string(0)) {
+		isMalloc = false;
+	}
 
 	CGBufferBase(int size, std::string name)
 		: m_bufferSize(size), bufferNmae(name), isMalloc(false), m_rawPtr(nullptr), m_devicePtr(nullptr)
@@ -229,6 +231,9 @@ public:
 	}
 
 	bool malloc() {
+		if (isMalloc) {
+			return false;
+		}
 		isMalloc = true;
 		cudaMalloc((void**)&m_devicePtr, m_bufferSize * sizeof(T));
 
@@ -244,6 +249,8 @@ public:
 
 	bool loadDeviceToHost() {
 		m_data.resize(m_bufferSize);
+		std::cout << m_data.size() << std::endl;
+		std::cout << m_bufferSize << std::endl;
 		cudaMemcpy(m_data.data(), m_devicePtr, m_bufferSize * sizeof(T), cudaMemcpyDeviceToHost);
 		return true;
 	}
