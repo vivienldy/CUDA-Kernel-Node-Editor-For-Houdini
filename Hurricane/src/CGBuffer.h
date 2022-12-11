@@ -249,8 +249,6 @@ public:
 
 	bool loadDeviceToHost() {
 		m_data.resize(m_bufferSize);
-		std::cout << m_data.size() << std::endl;
-		std::cout << m_bufferSize << std::endl;
 		cudaMemcpy(m_data.data(), m_devicePtr, m_bufferSize * sizeof(T), cudaMemcpyDeviceToHost);
 		return true;
 	}

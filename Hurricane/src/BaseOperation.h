@@ -32,8 +32,8 @@ namespace CodeGenerator
                 rawDataZ.FieldInfo = inputVectorField.FieldInfoZ;
                 rawDataZ.VoxelData = inputVectorField.VoxelDataZ;
                 seperateScalarFields[0] = rawDataX;
-                seperateScalarFields[1] = rawDataX;
-                seperateScalarFields[2] = rawDataX;
+                seperateScalarFields[1] = rawDataY;
+                seperateScalarFields[2] = rawDataZ;
             }
 
             __host__ __device__ inline int Index3DToIndex1D(
