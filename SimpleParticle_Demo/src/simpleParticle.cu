@@ -16,10 +16,10 @@ void checkCUDAError(const char* msg, int line = -1) {
     }
 }
 
-glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
-{
-    return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
-}
+//glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
+//{
+//    return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
+//}
 
 __global__ void CodeGenerator::CUDAKernel::simpleParticle(glm::vec3* geo1_simpleParticle_geometryvopglobal1_Pbuffer, glm::vec3* geo1_simpleParticle_geometryvopglobal1_vbuffer, float geo1_simpleParticle_geometryvopglobal1_TimeInc,  int numThreads)
 {

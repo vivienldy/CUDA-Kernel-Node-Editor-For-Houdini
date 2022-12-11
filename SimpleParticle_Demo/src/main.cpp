@@ -36,7 +36,7 @@ int main() {
 
      // ===== load from task json
     int startFrame = 0;
-    int endFrame = 3;
+    int endFrame = 200;
     float FPS = 24.f;
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;

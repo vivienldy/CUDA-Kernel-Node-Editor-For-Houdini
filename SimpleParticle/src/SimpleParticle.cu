@@ -32,14 +32,13 @@ __global__ void CodeGenerator::CUDAKernel::particleAdvect (
     glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer,
     glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer,
     glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer,
-    glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer,
     glm::vec3* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer,
     int numThreads)
 {
   int index = threadIdx.x + (blockIdx.x * blockDim.x);
   if(index > numThreads)
     return;
-  CodeGenerator::GenericCode::particleAdvect(
+  CodeGenerator::GenericCode::particle_advect(
       geo1_solver1_d_s_pointvop2__DEBUG_turb_turb,
       geo1_solver1_d_s_pointvop2__DEBUG_amp_amp,
       geo1_solver1_d_s_pointvop2__DEBUG_freq_freq,
@@ -50,7 +49,6 @@ __global__ void CodeGenerator::CUDAKernel::particleAdvect (
       __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer,
       __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer,
       __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer,
-      __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer,
       __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer,
       index);
 }
@@ -70,7 +68,7 @@ void CodeGenerator::CUDA::ParticleAdvect (
     CGBuffer<glm::vec3>* __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer,
     int blockSize)
 {
-    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->malloc();
+    /*geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->malloc();
     geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->loadHostToDevice();
 
     geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer->malloc();
@@ -95,7 +93,7 @@ void CodeGenerator::CUDA::ParticleAdvect (
     __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->loadHostToDevice();
 
     __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->malloc();
-    __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->loadHostToDevice();
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->loadHostToDevice();*/
 
     int numOfThreads = geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->getSize();
     auto num_blocks_threads = ThreadBlockInfo(blockSize, numOfThreads);
@@ -111,7 +109,6 @@ void CodeGenerator::CUDA::ParticleAdvect (
           __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->getDevicePointer(),
           __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer->getDevicePointer(),
           __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer->getDevicePointer(),
-          __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer->getDevicePointer(),
           __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->getDevicePointer(),
           numOfThreads);
 

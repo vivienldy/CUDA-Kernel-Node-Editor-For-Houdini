@@ -72,12 +72,16 @@ set(headers
     src/simpleParticle.cuh
     src/simpleParticle.GenericCode.h
     src/simpleParticle.h
+    src/XNoise.GenericCode.h
+    src/XNoise.h
     )
 
 set(sources
     src/main.cpp
     src/simpleParticle.cpp
     src/simpleParticle.cu
+    src/XNoise.GPU.cu
+    src/XNoise.cpp
     )
 
 list(SORT headers)

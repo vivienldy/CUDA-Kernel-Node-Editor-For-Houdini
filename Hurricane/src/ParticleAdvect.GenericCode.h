@@ -40,7 +40,7 @@ namespace CodeGenerator
 			//}
 
 			// Generate by curlnoise1
-			glm::vec3 geo1_ParticleAdvect_curlnoise1_noise = curlnoise(/*char(pnoise), */geo1_ParticleAdvect_geometryvopglobal1_P/*, glm::vec3(1.0f, 1.0f, 1.0f), geo1_ParticleAdvect_offset_offset, float(1.0f), float(0.5f), float(1.0f), int(3), float(0.0001f), float(1.0f), float(1.0f), glm::vec3(0.0f, 0.0f, 0.0f), char(), int(0)*/);
+			glm::vec3 geo1_ParticleAdvect_curlnoise1_noise = curlnoise(geo1_ParticleAdvect_geometryvopglobal1_OpInput1, geo1_ParticleAdvect_geometryvopglobal1_P);
 
 			// Generate by createColor
 			glm::vec3 geo1_ParticleAdvect_createColor__Cd = createColor(geo1_ParticleAdvect_geometryvopglobal1_P, geo1_ParticleAdvect_geometryvopglobal1_age, geo1_ParticleAdvect_geometryvopglobal1_Cd, geo1_ParticleAdvect_geometryvopglobal1_OpInput1, geo1_ParticleAdvect_geometryvopglobal1_TimeInc);
