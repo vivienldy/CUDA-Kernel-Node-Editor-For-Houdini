@@ -347,6 +347,7 @@ namespace glm
 		this->y *= static_cast<T>(s);
 		this->z *= static_cast<T>(s);
 		this->w *= static_cast<T>(s);
+
 		return *this;
 	}
 

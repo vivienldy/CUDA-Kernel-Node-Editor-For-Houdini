@@ -1,5 +1,6 @@
 
-#include "../../include/xnoise/XNoise.h"
+#include "xnoise/XNoise.h"
+#include "CGUtility.h"
 
 namespace CodeGenerator {
 	namespace CUDAKernel {
@@ -16,7 +17,7 @@ namespace CodeGenerator {
 	}//@namespace end of : ProceduralContect
 }
 
-#include "../../include/xnoise/XNoise.GenericCode.h"
+#include "xnoise/XNoise.GenericCode.h"
 
 __global__ void CodeGenerator::CUDAKernel::curlNoise4DVector(CurlNoiseParam curlNoiseParam,
 	glm::vec3* posRaw,

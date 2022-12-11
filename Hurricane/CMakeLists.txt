@@ -69,6 +69,8 @@ set(headers
     src/CGGeometry.h
     src/CGAABB.h
     src/BaseOperation.h
+    src/xnoise/XNoise.h
+    src/xnoise/XNoise.GenericCode.h
     src/volumevop1.cuh
     src/volumevop1.GenericCode.h
     src/volumevop1.h
@@ -79,6 +81,8 @@ set(headers
 
 set(sources
     src/main.cpp
+    src/XNoise.cpp
+    src/XNoise.GPU.cu
     src/volumevop1.cpp
     src/volumevop1.cu
     src/ParticleAdvect.cpp

@@ -1,7 +1,7 @@
 
 #include <algorithm>
-#include "../../include/xnoise/XNoise.GenericCode.h"
-#include "../../include/xnoise/XNoise.h"
+#include "xnoise/XNoise.GenericCode.h"
+#include "xnoise/XNoise.h"
 
 
 #define XNOISE_SIZE 57368
