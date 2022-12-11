@@ -69,12 +69,12 @@ On the CPU, we will use a for loop to iterate over each particle and update thei
 Although the way of traversing the particles is different, the code used to calculate its new position is the same. This line of code is an example of CPU-GPU Generic code.
 
 ## Read in Houdini data (CGBuffer)
-To properly handle the data from Houdini, we created a helper class ```CGBuffer```. With this helper class, we can maintain the memory usage in both Host and Device using fixed functions. This greatly reduces the difficulty of generating real codes.
+To properly handle the data from Houdini, we created a helper class ```CGBuffer```. With this helper class, we can maintain the memory usage in both Host and Device using fixed functions. This greatly reduces the difficulty of generating real codes as we can use fixed functions to replace original codes.
 
 Therefore, initially, the data would be stored in the class ```CGBuffer```. Then, it will be uploaded to host or device container depending on what process unit we want to use. Afther that, we process the operations on the data and copy to the host side to do final output.
 
 ## Code to OBJ
-After running the calculation, the program will generate an Obj file to visualize the result on Houdini. The difficult of this part is to build a tenplate code for all of the possible data type. Here, we use a ```void pointer``` to handle the data, so that we can point to different data type without any compilation error. Then, we can output the format we want according to the data type.
+After running the calculation, the program will generate an OBJ file to visualize the result on Houdini. The difficult of this part is to build a tenplate code for all of the possible data type. Here, we use a ```void pointer``` to handle the data, so that we can point to different data type without any compilation error. Then, we can output the format we want according to the data type. The OBJ file contains all the position of the points in one specific frame. 
 
 ## Test OBJ Back in Houdini
 TODO: Dongying
@@ -91,7 +91,7 @@ TODO:
 Todo: 
 1) Add final visualization results 
 ### Particle Emitter
-TODO: 
+
 This custom class aim to generate particles during the program. Since our original code can not change the size of the memory allocation during calculation, we need an additional helper class to fix the problems. This helper class will bind every data buffer in the program and increase the sizes of the buffers in the middle of the calculation. Therefore, the particles in the rendering will increase to perform a better effect.
 
 2) Add Houdini visualization result - Dongying
