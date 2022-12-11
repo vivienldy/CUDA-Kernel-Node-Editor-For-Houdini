@@ -10,16 +10,56 @@ namespace CodeGenerator
     {
         namespace GenericCode
         {
+            struct CurlNoiseParam
+            {
+
+                CG_SHARE_FUNC CurlNoiseParam()
+                {
+                    // AlphaCore::ProceduralContent::AxNoiseType::kPerlinNoise;
+                    StepSize = 0.001f;
+                    Threshold = 0.001f;
+                    NoiseData = nullptr;
+                    Frequency = glm::vec3(1.0f, 1.0f, 1.0f);
+                    Offset = glm::vec4();
+                    Turbulence = 3;
+                    Amplitude = 1.0f;
+                    Roughness = 0.5f;
+                    Attenuation = 1.0;
+                }
+                CG_SHARE_FUNC ~CurlNoiseParam()
+                {
+                }
+                glm::vec3 Frequency;
+                glm::vec4 Offset;
+                int Turbulence; // fbm
+                float Amplitude;
+                float Roughness;
+                float Attenuation;
+                float TimeOffset;
+                float StepSize;
+                void *CollisionSDF;
+                void *NoiseData;
+                float Threshold;
+            };
+
             // ----- helper function
             __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos, glm::vec3 freq, glm::vec3 offset, glm::vec3 nml, string type, string geo, int turb, int bounce, float amp, float rough, float atten, float distance, float radius, float h)
             {
-                return glm::vec3(1.f);
+
+                auto noiseParam = MakeDefaultCurlNoiseDevice();
+                CUDA::CurlNoise4DVector(
+                    noiseParam,
+                    pos,
+                    pos,
+                    XNoiseDataManager::GetInstance()->GetXNoiseDataDevice(), 0.0f, 0.0416);
+                    
+                return glm::vec3(pos);
             }
 
             __host__ __device__ inline float fit(float x, float omin, float omax, float nmin, float nmax)
             {
                 float t;
-                t = glm::clamp((x - omin) / (omax - omin), 0, 1);
+                t = glm::clamp((x - omin) / (omax - omin), 0.f, 1.f);
                 return glm::mix(nmin, nmax, t);
             }
 
@@ -96,10 +136,13 @@ namespace CodeGenerator
                 // float ceil = flr + 1;
                 // float v1 = ramp_PRM.posList[(int)flr] * (ceil - position);
                 // float v2 = ramp_PRM.posList[(int)ceil] * (position - flr);
-                //return v1 + v2;
-                if (input > 1.f) return 1.f;
-                else if (input < 0.f) reuturn 0.f;
-                else return input;
+                // return v1 + v2;
+                if (input > 1.f)
+                    return 1.f;
+                else if (input < 0.f)
+                    reuturn 0.f;
+                else
+                    return input;
             }
 
             __host__ __device__ inline glm::vec3 relbbox(CGGeometry::RawData file, glm::vec3 pos)

@@ -12,7 +12,6 @@
 #include <cmath>
 #include <unordered_map>
 #include <unordered_set>
-#include <unordered_set>
 
 #include <glm/glm.hpp>
 #include <device_launch_parameters.h>
@@ -55,7 +54,6 @@ public:
 	std::string getName() { return name; }
 
 	void delegatePointBuffer(CGBufferBase* pointer) {
-		m_pointBuffers.insert(pointer);
 		m_pointBuffers.insert(pointer);
 	}
 
@@ -135,7 +133,8 @@ public:
 				for (int k = 0; k < desc.speed / desc.deltaX; k++) {
 					for (int i = 0; i <= desc.size.y / desc.deltaX; i++) {
 						for (int j = 0; j <= desc.size.x / desc.deltaX; j++) {
-							velocity.push_back(desc.center - glm::vec3(desc.size, 0) / 2.f + glm::vec3(j * desc.deltaX, i * desc.deltaX, 0));
+							//velocity.push_back(desc.center - glm::vec3(desc.size, 0) / 2.f + glm::vec3(j * desc.deltaX, i * desc.deltaX, 0));
+							velocity.push_back(desc.center - glm::vec3(desc.size.x, 0, desc.size.y) / 2.f + glm::vec3(j * desc.deltaX, 0.f, i * desc.deltaX));
 							velocity.back() += k * desc.deltaX * desc.direction;
 						}
 					}
@@ -154,7 +153,7 @@ public:
 
 				std::vector<float> ages(appendSize, 0.f);
 
-				cudaMemcpy(((glm::vec3*)buffer->getDevicePtr()) + ((int)buffer->getSize() - appendSize), ages.data(), appendSize * buffer->typeSize(), cudaMemcpyHostToDevice);
+				cudaMemcpy(((float*)buffer->getDevicePtr()) + ((int)buffer->getSize() - appendSize), ages.data(), appendSize * buffer->typeSize(), cudaMemcpyHostToDevice);
 			}
 		}
 	}

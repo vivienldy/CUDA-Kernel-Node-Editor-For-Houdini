@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CGBuffer.h"
+#include "xnoise/XNoise.h"
 
 class CGGeometry
 {
@@ -9,12 +10,14 @@ public:
     CGBuffer<glm::vec3>* m_PosBuffer;
     CGBuffer<glm::vec3>* m_CdBuffer;
     CGVectorField3D<float>* m_VelField;
+    void* noiseData;
 
     struct RAWData {
         CGAABB bbox;
         glm::vec3* posBuffer;
         glm::vec3* cdBuffer;
         CGVectorField3D<float>::RAWData velFieldRAWData;
+        void* noiseData;
     };
 
     RAWData GetGeometryRawData() {
@@ -24,6 +27,7 @@ public:
         rawData.posBuffer = (m_PosBuffer != nullptr) ? m_PosBuffer->getRawData() : nullptr;
         rawData.cdBuffer = (m_CdBuffer != nullptr) ? m_CdBuffer->getRawData() : nullptr;
         rawData.velFieldRAWData = (m_VelField != nullptr) ? m_VelField->GetFieldRAWData() : CGVectorField3D<float>::RAWData();
+        rawData.noiseData = XNoiseDataManager::GetInstance()->GetXNoiseData();
         return rawData;
     }
 
@@ -34,6 +38,7 @@ public:
         rawData.posBuffer = (m_PosBuffer != nullptr) ? m_PosBuffer->getDevicePointer() : nullptr;
         rawData.cdBuffer = (m_CdBuffer != nullptr) ? m_CdBuffer->getDevicePointer() : nullptr;
         rawData.velFieldRAWData = (m_VelField != nullptr) ? m_VelField->GetFieldRAWDataDevice() : CGVectorField3D<float>::RAWData();
+        rawData.noiseData = XNoiseDataManager::GetInstance()->GetXNoiseDataDevice();
         return rawData;
     }
 
@@ -48,7 +53,7 @@ public:
     CGBuffer<glm::vec3>* posBuffer,
     CGBuffer<glm::vec3>* cdBuffer,
     CGVectorField3D<float>* velField) 
-      : m_Bbox(bbox), m_PosBuffer(posBuffer), m_CdBuffer(cdBuffer), m_VelField(velField)
+      : m_Bbox(bbox), m_PosBuffer(posBuffer), m_CdBuffer(cdBuffer), m_VelField(velField), noiseData(nullptr)
     {
 
     }

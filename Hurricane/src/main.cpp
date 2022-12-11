@@ -5,8 +5,8 @@
 #include "CGGenerator.h"
 #include "CGGeometry.h"
 
-#define CPU_VERSION 0
-#define GPU_VERSION 1
+#define CPU_VERSION 1
+#define GPU_VERSION 0
 
 void colorCreateVolumeCreate() {
     glm::vec3 pivot = glm::vec3(-1.f, 0.6f, 3.7f);
@@ -39,7 +39,7 @@ int main() {
     desc.speed = 1;
     desc.size = glm::vec2(12, 12);
     desc.deltaX = 0.27f;
-    desc.center = glm::vec3(-1.f, 0.5f, 3.7f);
+    desc.center = glm::vec3(-1.f, 0.5f, 1.77f);
 
     ParticleGenerator* particleGenerator = new ParticleGenerator(desc);
     particleGenerator->delegatePointBuffer(posBuffer);
@@ -53,6 +53,7 @@ int main() {
     glm::vec3 res = glm::vec3(22, 33, 22);
     glm::vec3 fieldSize = glm::vec3(17.6f, 26.4f, 17.6f);
     float voxelSize = 0.8f;
+
     // field data is initialize to zero
     CGField3D<float>* fieldX = new CGField3D<float>(
         pivot,
@@ -102,7 +103,7 @@ int main() {
     // particleAdvectVop_OpInput1: a volume for creating color
     // particleAdvectVop_OpInput2: a velocity field
     // create the volume for creating color from file
-    glm::vec3 cdVolumePivot = glm::vec3(-1.f, 0.6f, 3.7f);
+    glm::vec3 cdVolumePivot = glm::vec3(-1.f, 0.6f, 1.77f);
     glm::vec3  cdVolumeRes = glm::vec3(65, 7, 64);
     glm::vec3  cdVolumeFieldSize = glm::vec3(13.f, 1.4f, 12.8f);
     float  cdVolumeVoxelSize = 0.2f;
@@ -120,8 +121,13 @@ int main() {
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
 
-    // particle emitter
-    // first load pos buffer to device
+#if GPU_VERSION
+    volumeVop1_OpInput1->DeviceMalloc();
+    volumeVop1_OpInput1->LoadToDevice();
+
+    volumeVop1_OpInput2->DeviceMalloc();
+    volumeVop1_OpInput2->LoadToDevice();
+
     posBuffer->malloc();
     posBuffer->loadHostToDevice();
     ageBuffer->malloc();
@@ -130,6 +136,13 @@ int main() {
     cdBuffer->loadHostToDevice();
     agePingpongBuffer->malloc();
     agePingpongBuffer->loadHostToDevice();
+
+    particleAdvectVop_OpInput1->DeviceMalloc();
+    particleAdvectVop_OpInput1->LoadToDevice();
+
+    particleAdvectVop_OpInput2->DeviceMalloc();
+    particleAdvectVop_OpInput2->LoadToDevice();
+# endif
 
     for (int i = startFrame; i < endFrame; ++i) {
         //hard code var block
@@ -163,10 +176,8 @@ int main() {
 
         ageBuffer->copy(agePingpongBuffer);
 #elif GPU_VERSION
-        std::cout << "generate\n";
+        // particle emitter
         particleGenerator->generateParticlesGPU();
-
-        std::cout << "generate done\n";
 
         CodeGenerator::CUDA::volumevop1(
             volumeVop1_input5,
@@ -176,11 +187,7 @@ int main() {
             volumeVop1_OpInput1,
             volumeVop1_OpInput2);
 
-        std::cout << "C\n";
-
-        velocityField->LoadToHost();
-
-        std::cout << "D\n";
+        //velocityField->LoadToHost();
 
         CodeGenerator::CUDA::ParticleAdvect(
             particleAdvectVop_offset,
@@ -193,12 +200,14 @@ int main() {
             particleAdvectVop_OpInput1,
             particleAdvectVop_OpInput2,
             agePingpongBuffer);
-
-        std::cout << "E\n";
-
+       
+        cudaMemcpy(ageBuffer->getDevicePointer(), agePingpongBuffer->getDevicePointer(), sizeof(float) * ageBuffer->getSize(), cudaMemcpyDeviceToDevice);
+        //std::string pathafter = "../userOutputData/vel_field_test/age_aftercopy";
+        //pathafter.append(std::to_string(Frame + 1));
+        //pathafter.append(".obj");
+        //ageBuffer->outputObj(pathafter);
         posBuffer->loadDeviceToHost();
-
-        std::cout << "F\n";
+        //cdBuffer->loadDeviceToHost();
 #endif
 
         // save vel_field buffer as obj file
@@ -226,24 +235,29 @@ int main() {
 
         //posBuffer->outputObj(outputObjFilePath);
 
- /*       velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
-        velocityField->m_FieldY->GetVoxelBufferPtr()->outputObj(velYFilePath);
-        velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);*/
+        //velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
+        //velocityField->m_FieldY->GetVoxelBufferPtr()->outputObj(velYFilePath);
+        //velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);
+        velocityField->WriteFieldAsObj(velXFilePath);
 
         // save pos buffer as obj file
-        std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_";
+        std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_test";
+        std::string cdOutputObjFilePathBase = "../userOutputData/pos/cd_test";
 
 #if CPU_VERSION
         posOutputObjFilePathBase.append("cpu_");
+        cdOutputObjFilePathBase.append("cpu_");
 #elif GPU_VERSION
         posOutputObjFilePathBase.append("gpu_");
+        cdOutputObjFilePathBase.append("gpu_");
 #endif
         posOutputObjFilePathBase.append(frame);
         posOutputObjFilePathBase.append(".obj");
+        cdOutputObjFilePathBase.append(frame);
+        cdOutputObjFilePathBase.append(".obj");
 
-        std::cout << "Output\n";
         posBuffer->outputObj(posOutputObjFilePathBase);
+        //cdBuffer->outputObj(cdOutputObjFilePathBase);
         std::cout << "-------- frame: "  << frame << std::endl;
-
     }
 }

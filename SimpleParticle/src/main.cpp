@@ -45,8 +45,8 @@ int curlNoiseTestGPU()
 int main() // ? 还是main函数应该是现在单独的main.cpp 里
 {
     //curlNoiseTest();
-    curlNoiseTestGPU();
-    return -1;
+    //curlNoiseTestGPU();
+    //return -1;
     // ===== create input buffer
     // pbuffer, vbuffer, timeInc is defined inside for loop
     // load pbuffer from file
@@ -101,6 +101,35 @@ int main() // ? 还是main函数应该是现在单独的main.cpp 里
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
 
+#if GPU_VERSION 
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->malloc();
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->loadHostToDevice();
+
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer->malloc();
+    geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_vbuffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_add2_sum_debug_buffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->loadHostToDevice();
+
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->malloc();
+    __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer->loadHostToDevice();
+#endif
+
     for (int i = startFrame; i < endFrame; ++i) {
         //hard code var block
         float Time = i / FPS;
@@ -118,7 +147,6 @@ int main() // ? 还是main函数应该是现在单独的main.cpp 里
             __geo1_solver1_d_s_pointvop2__DEBUG_multiply2_product_debug_buffer,
             __geo1_solver1_d_s_pointvop2__DEBUG_add1_sum_debug_buffer,
             __geo1_solver1_d_s_pointvop2__DEBUG_multiply1_product_debug_buffer,
-            __geo1_solver1_d_s_pointvop2__DEBUG_curlnoise1_noise_debug_buffer,
             __geo1_solver1_d_s_pointvop2__DEBUG_multiply3_product_debug_buffer);
 
 #elif GPU_VERSION
@@ -152,7 +180,7 @@ int main() // ? 还是main函数应该是现在单独的main.cpp 里
         outputObjFilePath.append(frame);
         outputObjFilePath.append(".obj");
 
-        geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->outputObj(outputObjFilePath);
+        //geo1_solver1_d_s_pointvop2__DEBUG_geometryvopglobal1_Pbuffer->outputObj(outputObjFilePath);
     }
 }
 

@@ -325,5 +325,18 @@ public:
         // assume our three scalar field are same
         return m_FieldX->GetNumVoxels(); 
     }
+
+    void WriteFieldAsObj(std::string filePath) {
+        CGBuffer<glm::vec3> fieldDataBuffer = CGBuffer<glm::vec3>();
+        fieldDataBuffer.setSize(GetNumVoxels());
+        for (int i = 0; i < GetNumVoxels(); ++i) {
+            glm::vec3 value = glm::vec3(
+                m_FieldX->GetVoxelBufferPtr()->getData()[i],
+                m_FieldY->GetVoxelBufferPtr()->getData()[i],
+                m_FieldZ->GetVoxelBufferPtr()->getData()[i]);
+            fieldDataBuffer.setValue(value, i);
+        }
+        fieldDataBuffer.outputObj(filePath);
+    }
 };
 

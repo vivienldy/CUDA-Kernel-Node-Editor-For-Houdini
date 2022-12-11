@@ -37,15 +37,6 @@ void CodeGenerator::CUDA::volumevop1(
     CGGeometry *geo1_volumevop1_volumevopglobal1_OpInput2,
     int blockSize)
 {
-    // Buffer malloc
-    // CGGeometry malloc
-    geo1_volumevop1_volumevopglobal1_OpInput1->DeviceMalloc();
-    geo1_volumevop1_volumevopglobal1_OpInput1->LoadToDevice();
-
-    geo1_volumevop1_volumevopglobal1_OpInput2->DeviceMalloc();
-    geo1_volumevop1_volumevopglobal1_OpInput2->LoadToDevice();
-
-
     // Compute threads num
     int numOfThreads = geo1_volumevop1_volumevopglobal1_OpInput1->m_VelField->GetNumVoxels();
     // Compute blocks num
