@@ -24,25 +24,32 @@ int main() {
     // ===== create particle emitter
     // initilize data read from task json
     ParticleGenerator::RAWDesc desc;
-    desc.direction = glm::vec3(0, 0, 1);
+    desc.direction = glm::vec3(0, 1, 0);
     desc.speed = 1;
-    desc.size = glm::vec2(12, 12);
-    desc.deltaX = 1.f;
+    desc.size = glm::vec2(1, 1);
+    desc.deltaX = 0.2f;
     desc.center = glm::vec3(-1.f, 0.5f, 3.7f);
 
     ParticleGenerator* particleGenerator = new ParticleGenerator(desc);
     particleGenerator->delegatePointBuffer(posBuffer);
     particleGenerator->delegatePointBuffer(velBuffer);
 
+    // custome parm
+     CGGeometry* simpleParticleVop_OpInput1 = new CGGeometry(CGAABB(), nullptr, nullptr, nullptr);
+     glm::vec3 simpleParticleVop_force = glm::vec3(0.f, 0.f, 0.1f);
+
      // ===== load from task json
     int startFrame = 0;
-    int endFrame = 200;
+    int endFrame = 500;
     float FPS = 24.f;
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
 
 #if GPU_VERSION
-    // malloc() here
+    posBuffer->malloc();
+    posBuffer->loadHostToDevice();
+    velBuffer->malloc();
+    velBuffer->loadHostToDevice();
 # endif
 
     for (int i = startFrame; i < endFrame; ++i) {
@@ -56,17 +63,27 @@ int main() {
 
         // create velocity field
         CodeGenerator::simpleParticle(
+            simpleParticleVop_force,
+            TimeInc * Frame,
             posBuffer,
             velBuffer, 
-            TimeInc);
+            TimeInc,
+            simpleParticleVop_OpInput1);
 
 #elif GPU_VERSION
-
+        particleGenerator->generateParticlesGPU();
+        CodeGenerator::CUDA::simpleParticle(
+            TimeInc * Frame,
+            posBuffer,
+            velBuffer,
+            TimeInc,
+            simpleParticleVop_OpInput1);
+        posBuffer->loadDeviceToHost();
 #endif
 
         // save pos buffer as obj file
         std::string frame = std::to_string(Frame + 1);
-        std::string posOutputObjFilePathBase = "../userOutputData/simple_particle_pos";
+        std::string posOutputObjFilePathBase = "../userOutputData/simple_particle_pos_1_";
 
 #if CPU_VERSION
         posOutputObjFilePathBase.append("cpu_");

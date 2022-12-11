@@ -6,6 +6,7 @@
 
 #include "CGField.h"
 #include "CGGeometry.h"
+#include "XNoise.GenericCode.h"
 
 namespace CodeGenerator
 {
@@ -235,9 +236,39 @@ namespace CodeGenerator
     namespace GenericCode
     {
         // ----- helper function
-        __host__ __device__ inline glm::vec3 curlnoise(glm::vec3 pos/*, glm::vec3 freq, glm::vec3 offset, glm::vec3 nml, string type, string geo, int turb, int bounce, float amp, float rough, float atten, float distance, float radius, float h*/)
+        __host__ __device__ inline glm::vec3 xnoise(
+            CGGeometry::RAWData file, 
+            glm::vec3 pos, 
+            glm::vec3 freq = glm::vec3(0.5f), 
+            glm::vec3 offset = glm::vec3(0.f),
+            glm::vec3 nml = glm::vec3(1.0f),
+            int turb = 0, 
+            int bounce = 0, 
+            float amp = 10.f, 
+            float rough = 0.5f, 
+            float atten = 0.5f, 
+            float h = 0.01f,
+            float time = 0.f)
         {
-            return glm::vec3(1.f);
+           
+            CurlNoiseParam noiseParam;
+            noiseParam.Amplitude = amp;
+            noiseParam.Attenuation = atten;
+            noiseParam.Frequency = freq * 0.5f;
+            noiseParam.Offset = glm::vec4(offset, 0.f);
+            noiseParam.Roughness = rough;
+            noiseParam.Turbulence = turb;
+            noiseParam.StepSize = h;
+
+            glm::vec3 result = CodeGenerator::GenericCode::Internal::CurlNoise4DVector(
+                noiseParam,
+                pos,
+                1.0,//replace by ramp
+                file.noiseData,
+                0.0f/*time*/,
+                0.0416/*dt*/);
+
+            return result;
         }
 
         __host__ __device__ inline float fit(float x, float omin, float omax, float nmin, float nmax)

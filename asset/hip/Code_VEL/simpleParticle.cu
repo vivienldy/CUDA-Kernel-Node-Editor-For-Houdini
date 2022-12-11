@@ -21,17 +21,17 @@ glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
     return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
 }
 
-__global__ void CodeGenerator::CUDAKernel::simpleParticle(glm::vec3* geo1_simpleParticle_geometryvopglobal1_Pbuffer, glm::vec3* geo1_simpleParticle_geometryvopglobal1_vbuffer, float geo1_simpleParticle_geometryvopglobal1_TimeInc,  int numThreads)
+__global__ void CodeGenerator::CUDAKernel::simpleParticle(glm::vec3 geo1_simpleParticle_parm2_force, float geo1_simpleParticle_parm1_time, glm::vec3* geo1_simpleParticle_geometryvopglobal1_Pbuffer, glm::vec3* geo1_simpleParticle_geometryvopglobal1_vbuffer, float geo1_simpleParticle_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_simpleParticle_geometryvopglobal1_OpInput1,  int numThreads)
 {
   int index = threadIdx.x + (blockIdx.x * blockDim.x);
   if(index > numThreads)
     return;
 
-  CodeGenerator::GenericCode::simpleParticle(geo1_simpleParticle_geometryvopglobal1_Pbuffer, geo1_simpleParticle_geometryvopglobal1_vbuffer, geo1_simpleParticle_geometryvopglobal1_TimeInc,  index);
+  CodeGenerator::GenericCode::simpleParticle(geo1_simpleParticle_parm2_force, geo1_simpleParticle_parm1_time, geo1_simpleParticle_geometryvopglobal1_Pbuffer, geo1_simpleParticle_geometryvopglobal1_vbuffer, geo1_simpleParticle_geometryvopglobal1_TimeInc, geo1_simpleParticle_geometryvopglobal1_OpInput1,  index);
 }
 
 void CodeGenerator::CUDA::simpleParticle (
-    CGBuffer<glm::vec3>* geo1_simpleParticle_geometryvopglobal1_Pbuffer, CGBuffer<glm::vec3>* geo1_simpleParticle_geometryvopglobal1_vbuffer, float geo1_simpleParticle_geometryvopglobal1_TimeInc, 
+    glm::vec3 geo1_simpleParticle_parm2_force, float geo1_simpleParticle_parm1_time, CGBuffer<glm::vec3>* geo1_simpleParticle_geometryvopglobal1_Pbuffer, CGBuffer<glm::vec3>* geo1_simpleParticle_geometryvopglobal1_vbuffer, float geo1_simpleParticle_geometryvopglobal1_TimeInc, CGGeometry* geo1_simpleParticle_geometryvopglobal1_OpInput1, 
     int blockSize)
 {
     // Buffer malloc
@@ -40,6 +40,9 @@ geo1_simpleParticle_geometryvopglobal1_Pbuffer->loadHostToDevice();
 
 geo1_simpleParticle_geometryvopglobal1_vbuffer->malloc();
 geo1_simpleParticle_geometryvopglobal1_vbuffer->loadHostToDevice();
+
+geo1_simpleParticle_geometryvopglobal1_OpInput1->DeviceMalloc();
+geo1_simpleParticle_geometryvopglobal1_OpInput1->LoadToDevice();
 
 
 
@@ -50,7 +53,7 @@ geo1_simpleParticle_geometryvopglobal1_vbuffer->loadHostToDevice();
     
     // Kernel launch
     CodeGenerator::CUDAKernel::simpleParticle<<<num_blocks_threads.x, num_blocks_threads.y>>>(
-        geo1_simpleParticle_geometryvopglobal1_Pbuffer->getDevicePointer(), geo1_simpleParticle_geometryvopglobal1_vbuffer->getDevicePointer(), geo1_simpleParticle_geometryvopglobal1_TimeInc,  numOfThreads);
+        geo1_simpleParticle_parm2_force, geo1_simpleParticle_parm1_time, geo1_simpleParticle_geometryvopglobal1_Pbuffer->getDevicePointer(), geo1_simpleParticle_geometryvopglobal1_vbuffer->getDevicePointer(), geo1_simpleParticle_geometryvopglobal1_TimeInc, geo1_simpleParticle_geometryvopglobal1_OpInput1->GetGeometryRawDataDevice(),  numOfThreads);
 
     checkCUDAErrorWithLine("simpleParticle error");
 

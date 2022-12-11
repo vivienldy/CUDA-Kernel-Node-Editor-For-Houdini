@@ -1,5 +1,6 @@
 
 #include "XNoise.h"
+#include "CGUtility.h"
 
 namespace CodeGenerator {
 	namespace CUDAKernel {

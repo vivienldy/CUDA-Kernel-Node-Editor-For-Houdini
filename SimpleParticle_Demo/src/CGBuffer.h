@@ -455,10 +455,10 @@ inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec3)
 
 
 
-inline glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
-{
-	return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
-}
+//inline glm::vec2 ThreadBlockInfo(int blockSize, int numThreads)
+//{
+//	return glm::vec2(int(numThreads / blockSize) + 1, blockSize > numThreads ? numThreads : blockSize);
+//}
 
 //int CGBufferBase::id = 0;
 

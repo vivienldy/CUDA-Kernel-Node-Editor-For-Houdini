@@ -121,7 +121,7 @@ def create_raw_output_json_pair(output_names, output_data_types, node_path):
             
 
 # ========= global value
-general_operation_list = ["curlnoise", "fit", "cross", "compare", "twoway", "floattovec", "clamp", "volumesamplefile"]
+general_operation_list = ["xnoise", "fit", "cross", "compare", "twoway", "floattovec", "clamp", "volumesamplefile"]
 signature_parm_suffix_dict = {"default": ["1", "2", "3"], "v":["_v1", "_v2", "_v3"], "p":["_p1", "_p2", "_p3"], "c":["_cr", "_cg", "_cb"], "n":["_n1", "_n2", "_n3"]} # uv, un, up, uc...
 
 # get the current python node
@@ -208,10 +208,16 @@ for vop_node in vop_children:
                 # normally, if signature is default, no matter point is vector or point, add 1,2,3 to parm name: pos1, pos2, pos3
                 # normally, if signature is not default, which has many data type.. need to add v1, v2, v3 / p1, p2, p3 / cr, cg, cg to parm name
                 if data_type == "vector" or data_type == "point":
-                    parm_suffix = signature_parm_suffix_dict[vop_node.parm("signature").eval()]
-                    ip.default_value = number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[0]).eval())) + "," + \
-                                    number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[1]).eval())) + "," +    \
-                                    number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[2]).eval()))
+                    if dag_node.method_name == "xnoise":
+                        ip.default_value = number_formatter(str(vop_node.parm(str(param_name) + "1"))) + "," + \
+                                        number_formatter(str(vop_node.parm(str(param_name) + "2"))) + "," +    \
+                                        number_formatter(str(vop_node.parm(str(param_name) + "3")))
+
+                    else:
+                        parm_suffix = signature_parm_suffix_dict[vop_node.parm("signature").eval()]
+                        ip.default_value = number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[0]).eval())) + "," + \
+                                        number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[1]).eval())) + "," +    \
+                                        number_formatter(str(vop_node.parm(str(param_name) + parm_suffix[2]).eval()))
                 else:  
                     ip.default_value = number_formatter(str(vop_node.parm(param_name).eval()))
                 print("    *** parm is default")
