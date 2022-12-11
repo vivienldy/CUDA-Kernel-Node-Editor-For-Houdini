@@ -326,6 +326,14 @@ public:
 		myfile.close();
 	}
 
+	void setValue(T value, int idx) {
+		if (idx > m_bufferSize) {
+			std::cout << "cannot set value" << std::endl;
+		}
+		m_data[idx] = value;
+		m_rawPtr = &m_data;
+	}
+
 	~CGBuffer() {
 		this->clear();
 	}

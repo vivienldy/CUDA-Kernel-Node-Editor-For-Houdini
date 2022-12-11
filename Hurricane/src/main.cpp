@@ -39,7 +39,7 @@ int main() {
     desc.speed = 1;
     desc.size = glm::vec2(12, 12);
     desc.deltaX = 0.27f;
-    desc.center = glm::vec3(-1.f, 0.5f, 3.7f);
+    desc.center = glm::vec3(-1.f, 0.5f, 1.77f);
 
     ParticleGenerator* particleGenerator = new ParticleGenerator(desc);
     particleGenerator->delegatePointBuffer(posBuffer);
@@ -103,7 +103,7 @@ int main() {
     // particleAdvectVop_OpInput1: a volume for creating color
     // particleAdvectVop_OpInput2: a velocity field
     // create the volume for creating color from file
-    glm::vec3 cdVolumePivot = glm::vec3(-1.f, 0.6f, 3.7f);
+    glm::vec3 cdVolumePivot = glm::vec3(-1.f, 0.6f, 1.77f);
     glm::vec3  cdVolumeRes = glm::vec3(65, 7, 64);
     glm::vec3  cdVolumeFieldSize = glm::vec3(13.f, 1.4f, 12.8f);
     float  cdVolumeVoxelSize = 0.2f;
@@ -207,7 +207,7 @@ int main() {
         //pathafter.append(".obj");
         //ageBuffer->outputObj(pathafter);
         posBuffer->loadDeviceToHost();
-        cdBuffer->loadDeviceToHost();
+        //cdBuffer->loadDeviceToHost();
 #endif
 
         // save vel_field buffer as obj file
@@ -238,6 +238,7 @@ int main() {
         //velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
         //velocityField->m_FieldY->GetVoxelBufferPtr()->outputObj(velYFilePath);
         //velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);
+        velocityField->WriteFieldAsObj(velXFilePath);
 
         // save pos buffer as obj file
         std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_test";
@@ -256,7 +257,7 @@ int main() {
         cdOutputObjFilePathBase.append(".obj");
 
         posBuffer->outputObj(posOutputObjFilePathBase);
-        cdBuffer->outputObj(cdOutputObjFilePathBase);
+        //cdBuffer->outputObj(cdOutputObjFilePathBase);
         std::cout << "-------- frame: "  << frame << std::endl;
     }
 }
