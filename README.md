@@ -3,6 +3,7 @@
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Final Project**
 
 ## Hurricane & Smoke With Auto-generated Code
+[**CLICK HERE FOR DEMO VIDEO**](https://drive.google.com/file/d/1sjZ-7YNE_EPBFdQovwDr7lyJpGx2AhB7/view?usp=share_link)
 <p align="center">
   <img width = "750" alt="auto_generated_hurricane" src="img/hurricane.gif">
 </p>
@@ -81,7 +82,7 @@ On the CPU, we will use a for loop to iterate over each particle and update thei
 
 Although the way of traversing the particles is different, the code used to calculate its new position is the same. This line of code is an example of CPU-GPU Generic code.
 <p align="center">
-  <img height = "650" alt="visualization" src="img/generate.gif">
+  <img width = "750" alt="visualization" src="img/generate.gif">
 </p>
 
 ## Read in Houdini data (CGBuffer)
@@ -94,14 +95,17 @@ After running the calculation, the program will generate an OBJ file to visualiz
 
 ## Test OBJ Back in Houdini
 <p align="center">
-  <img height = "650" alt="visualization" src="img/visualization.gif">
+  <img width = "750" alt="visualization" src="img/visualization.gif">
 </p>
 
 # Results
 ## Example 1: Simple particle
 ### Visualization of auto-generated code
 <p align="center">
-  <img height = "650" alt="auto_generated_simpleparticle" src="img/simpleparticle.gif">
+  <img width = "750" alt="auto_generated_simpleparticle" src="img/simpleparticle.gif">
+</p>
+<p align="center">
+  <img width = "750" alt="auto_generated_simpleparticle" src="img/simpleparticle2.gif">
 </p>
 
 ### Particle Emitter
@@ -110,6 +114,6 @@ This custom class aim to generate particles during the program. Since our origin
 ## Example 2: Tornado (velocity field)
 ### Visualization of auto-generated code
 <p align="center">
-  <img height = "650" alt="auto_generated_hurricane" src="img/hurricane.gif">
+  <img width = "750" alt="auto_generated_hurricane" src="img/hurricane.gif">
 </p>
 
