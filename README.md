@@ -2,9 +2,18 @@
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Final Project**
 
-by Dongying Liu, Wenqing Wang, and Yuchia Shen.
+<p align="center">
+  <img height = "650" alt="auto_generated_hurricane" src="img/hurricane.gif">
+</p>
+
+## **Team members:**
+  - Dongying Liu: [LinkedIn](https://www.linkedin.com/in/dongying-liu/), dongying@seas.upenn.edu
+  - Wenqing Wang: [LinkedIn](https://www.linkedin.com/in/wenqingwang0910/), wqwang@seas.upenn.edu
+  - Yuchia Shen: [LinkedIn](https://www.linkedin.com/in/yuchiashen/), chia0510@seas.upenn.edu
+
 
 # Project Overview
+
 ## **Goals**
 Provide an cuda kernel node editor for Houdini. 
 Users can create various types of effects based on Houdini VOP node, and our tool can auto-generate both CPU (for debugging) and CUDA code based on the VOP node.
@@ -77,22 +86,22 @@ Therefore, initially, the data would be stored in the class ```CGBuffer```. Then
 After running the calculation, the program will generate an OBJ file to visualize the result on Houdini. The difficult of this part is to build a tenplate code for all of the possible data type. Here, we use a ```void pointer``` to handle the data, so that we can point to different data type without any compilation error. Then, we can output the format we want according to the data type. The OBJ file contains all the position of the points in one specific frame. 
 
 ## Test OBJ Back in Houdini
-TODO: Dongying
 
 # Results
 ## Example 1: Simple particle
-TODO: 
-1) Add visualization results (compare Houdini/CPU/GPU created effects in Houdini) - Dongying
-2) Add generated files overview - Wenqing
-3) Add brief description - Wenqing
+### Visualization of auto-generated code
+<p align="center">
+  <img height = "650" alt="auto_generated_simpleparticle" src="img/simpleparticle.gif">
+</p>
 
 ### Particle Emitter
-## Example 2: Tornado (velocity field)
-Todo: 
-1) Add final visualization results 
-### Particle Emitter
-
 This custom class aim to generate particles during the program. Since our original code can not change the size of the memory allocation during calculation, we need an additional helper class to fix the problems. This helper class will bind every data buffer in the program and increase the sizes of the buffers in the middle of the calculation. Therefore, the particles in the rendering will increase to perform a better effect.
 
-2) Add Houdini visualization result - Dongying
+## Example 2: Tornado (velocity field)
+### Visualization of auto-generated code
+<p align="center">
+  <img height = "650" alt="auto_generated_hurricane" src="img/hurricane.gif">
+</p>
+
+
 
