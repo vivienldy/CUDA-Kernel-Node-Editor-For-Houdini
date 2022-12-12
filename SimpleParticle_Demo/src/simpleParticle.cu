@@ -31,16 +31,6 @@ void CodeGenerator::CUDA::simpleParticle (
     int blockSize)
 {
     // Buffer malloc
-    geo1_simpleParticle_geometryvopglobal1_Pbuffer->malloc();
-geo1_simpleParticle_geometryvopglobal1_Pbuffer->loadHostToDevice();
-
-geo1_simpleParticle_geometryvopglobal1_vbuffer->malloc();
-geo1_simpleParticle_geometryvopglobal1_vbuffer->loadHostToDevice();
-
-geo1_simpleParticle_geometryvopglobal1_OpInput1->DeviceMalloc();
-geo1_simpleParticle_geometryvopglobal1_OpInput1->LoadToDevice();
-
-
 
     // Compute threads num
     int numOfThreads = geo1_simpleParticle_geometryvopglobal1_Pbuffer->getSize();

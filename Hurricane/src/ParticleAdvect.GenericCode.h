@@ -5,11 +5,8 @@ namespace CodeGenerator
 {
 	namespace GenericCode
 	{
-		__host__ __device__ inline void ParticleAdvect(glm::vec3 geo1_ParticleAdvect_offset_offset, float geo1_ParticleAdvect_input3_input3, float geo1_ParticleAdvect_input2_input2, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Pbuffer, float* geo1_ParticleAdvect_geometryvopglobal1_agebuffer, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer, float geo1_ParticleAdvect_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput1, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput2, float* __geo1_ParticleAdvect_add1_sum_debug_buffer, int idx)
+		__host__ __device__ inline void ParticleAdvect(float geo1_ParticleAdvect_parameter_time, float geo1_ParticleAdvect_input3_input3, float geo1_ParticleAdvect_input2_input2, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Pbuffer, float* geo1_ParticleAdvect_geometryvopglobal1_agebuffer, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer, float geo1_ParticleAdvect_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput1, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput2, float* __geo1_ParticleAdvect_add1_sum_debug_buffer, int idx)
 		{
-			//if (idx == 20) {
-			//	printf("find 20: ");
-			//}
 			// Data Load 
 			// Geometry Global Input
 			glm::vec3 geo1_ParticleAdvect_geometryvopglobal1_P = geo1_ParticleAdvect_geometryvopglobal1_Pbuffer[idx];
@@ -19,37 +16,39 @@ namespace CodeGenerator
 
 			// Compute graph
 
-			// Generate by add1
+ // Generate by add1
 			float geo1_ParticleAdvect_add1_sum = geo1_ParticleAdvect_geometryvopglobal1_age + geo1_ParticleAdvect_geometryvopglobal1_TimeInc;
 
 			// Generate by volumesamplefile1
 			float geo1_ParticleAdvect_volumesamplefile1_volumevalue = volumesamplefile(geo1_ParticleAdvect_geometryvopglobal1_OpInput2, int(0), geo1_ParticleAdvect_geometryvopglobal1_P);
 
-			 // Generate by volumesamplefile2
+			// Generate by volumesamplefile2
 			float geo1_ParticleAdvect_volumesamplefile2_volumevalue = volumesamplefile(geo1_ParticleAdvect_geometryvopglobal1_OpInput2, int(1), geo1_ParticleAdvect_geometryvopglobal1_P);
 
 			// Generate by volumesamplefile3
 			float geo1_ParticleAdvect_volumesamplefile3_volumevalue = volumesamplefile(geo1_ParticleAdvect_geometryvopglobal1_OpInput2, int(2), geo1_ParticleAdvect_geometryvopglobal1_P);
 
-
 			// Generate by floattovec1
 			glm::vec3 geo1_ParticleAdvect_floattovec1_vec = floattovec(geo1_ParticleAdvect_volumesamplefile1_volumevalue, geo1_ParticleAdvect_volumesamplefile2_volumevalue, geo1_ParticleAdvect_volumesamplefile3_volumevalue);
-			
-			//if (idx == 20) {
-			//	printf("sampled vel: %f, %f, %f, \n ", geo1_ParticleAdvect_floattovec1_vec.x, geo1_ParticleAdvect_floattovec1_vec.y, geo1_ParticleAdvect_floattovec1_vec.z);
-			//}
 
-			// Generate by curlnoise1
-			glm::vec3 geo1_ParticleAdvect_curlnoise1_noise = curlnoise(geo1_ParticleAdvect_geometryvopglobal1_OpInput1, geo1_ParticleAdvect_geometryvopglobal1_P);
+			// Generate by xnoise
+			glm::vec3 geo1_ParticleAdvect_xnoise_noise = /*glm::vec3(1.0f); */xnoise(
+				geo1_ParticleAdvect_geometryvopglobal1_OpInput1, 
+				geo1_ParticleAdvect_geometryvopglobal1_P, 
+				glm::vec3(0.5f, 0.5f, 0.5f), 
+				glm::vec3(0.0f, 0.0f, 0.0f), 
+				glm::vec3(0.0f, 0.0f, 0.0f), 
+				int(1), 
+				int(0), 
+				float(0.5f), 
+				float(0.1f), 
+				float(1.0f), 
+				float(0.001f), 
+				geo1_ParticleAdvect_parameter_time);
 
 			// Generate by createColor
 			glm::vec3 geo1_ParticleAdvect_createColor__Cd = createColor(geo1_ParticleAdvect_geometryvopglobal1_P, geo1_ParticleAdvect_geometryvopglobal1_age, geo1_ParticleAdvect_geometryvopglobal1_Cd, geo1_ParticleAdvect_geometryvopglobal1_OpInput1, geo1_ParticleAdvect_geometryvopglobal1_TimeInc);
-			//if (idx == 20) {
-			//	printf("create color: %f, %f, %f, \n ", geo1_ParticleAdvect_createColor__Cd.x, geo1_ParticleAdvect_createColor__Cd.y, geo1_ParticleAdvect_createColor__Cd.z);
-			//}
-			//if (idx == 20) {
-			//	printf("age: %f \n ", geo1_ParticleAdvect_geometryvopglobal1_age);
-			//}
+
 			// Generate by vectofloat1
 			float geo1_ParticleAdvect_vectofloat1_fval1;
 			float geo1_ParticleAdvect_vectofloat1_fval2;
@@ -58,6 +57,7 @@ namespace CodeGenerator
 
 			// Generate by multiply1
 			glm::vec3 geo1_ParticleAdvect_multiply1_product = geo1_ParticleAdvect_floattovec1_vec * geo1_ParticleAdvect_input2_input2 * geo1_ParticleAdvect_vectofloat1_fval1;
+
 			// Generate by multiply2
 			float geo1_ParticleAdvect_multiply2_product = geo1_ParticleAdvect_vectofloat1_fval1 * geo1_ParticleAdvect_input3_input3;
 
@@ -71,7 +71,7 @@ namespace CodeGenerator
 			glm::vec3 geo1_ParticleAdvect_add3_sum = geo1_ParticleAdvect_floattovec2_vec;
 
 			// Generate by add2
-			glm::vec3 geo1_ParticleAdvect_add2_sum = geo1_ParticleAdvect_multiply1_product + geo1_ParticleAdvect_add3_sum + geo1_ParticleAdvect_curlnoise1_noise;
+			glm::vec3 geo1_ParticleAdvect_add2_sum = geo1_ParticleAdvect_multiply1_product + geo1_ParticleAdvect_add3_sum + geo1_ParticleAdvect_xnoise_noise;
 
 			// Generate by multiply3
 			glm::vec3 geo1_ParticleAdvect_multiply3_product = geo1_ParticleAdvect_add2_sum * geo1_ParticleAdvect_geometryvopglobal1_TimeInc;

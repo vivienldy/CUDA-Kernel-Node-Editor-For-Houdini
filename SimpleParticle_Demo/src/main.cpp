@@ -4,8 +4,8 @@
 
 #include "simpleParticle.h"
 
-#define CPU_VERSION 1
-#define GPU_VERSION 0
+#define CPU_VERSION 0
+#define GPU_VERSION 1
 
 int main() {
     // ===== create input buffer
@@ -27,7 +27,7 @@ int main() {
     desc.direction = glm::vec3(0, 1, 0);
     desc.speed = 1;
     desc.size = glm::vec2(1, 1);
-    desc.deltaX = 0.2f;
+    desc.deltaX = 0.1f;
     desc.center = glm::vec3(-1.f, 0.5f, 3.7f);
 
     ParticleGenerator* particleGenerator = new ParticleGenerator(desc);
@@ -36,11 +36,11 @@ int main() {
 
     // custome parm
      CGGeometry* simpleParticleVop_OpInput1 = new CGGeometry(CGAABB(), nullptr, nullptr, nullptr);
-     glm::vec3 simpleParticleVop_force = glm::vec3(0.f, 0.f, 0.1f);
+     glm::vec3 simpleParticleVop_force = glm::vec3(0.f, 0.f, 1.f);
 
      // ===== load from task json
     int startFrame = 0;
-    int endFrame = 500;
+    int endFrame = 240;
     float FPS = 24.f;
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
@@ -73,6 +73,7 @@ int main() {
 #elif GPU_VERSION
         particleGenerator->generateParticlesGPU();
         CodeGenerator::CUDA::simpleParticle(
+            simpleParticleVop_force,
             TimeInc * Frame,
             posBuffer,
             velBuffer,
@@ -83,7 +84,7 @@ int main() {
 
         // save pos buffer as obj file
         std::string frame = std::to_string(Frame + 1);
-        std::string posOutputObjFilePathBase = "../userOutputData/simple_particle_pos_1_";
+        std::string posOutputObjFilePathBase = "../userOutputData/simple_particle_pos_";
 
 #if CPU_VERSION
         posOutputObjFilePathBase.append("cpu_");

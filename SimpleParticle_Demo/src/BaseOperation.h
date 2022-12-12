@@ -254,7 +254,7 @@ namespace CodeGenerator
             CurlNoiseParam noiseParam;
             noiseParam.Amplitude = amp;
             noiseParam.Attenuation = atten;
-            noiseParam.Frequency = freq * 0.5f;
+            noiseParam.Frequency = freq/* * 0.5f*/;
             noiseParam.Offset = glm::vec4(offset, 0.f);
             noiseParam.Roughness = rough;
             noiseParam.Turbulence = turb;
@@ -265,7 +265,7 @@ namespace CodeGenerator
                 pos,
                 1.0,//replace by ramp
                 file.noiseData,
-                0.0f/*time*/,
+                time,
                 0.0416/*dt*/);
 
             return result;

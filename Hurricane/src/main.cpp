@@ -4,9 +4,10 @@
 #include "BaseOperation.h"
 #include "CGGenerator.h"
 #include "CGGeometry.h"
+#include "glm/gtc/matrix_transform.hpp"
 
-#define CPU_VERSION 1
-#define GPU_VERSION 0
+#define CPU_VERSION 0
+#define GPU_VERSION 1
 
 void colorCreateVolumeCreate() {
     glm::vec3 pivot = glm::vec3(-1.f, 0.6f, 3.7f);
@@ -95,9 +96,9 @@ int main() {
     CGAABB volumeVop_OpInput1_bbox = fieldX->GetAABB();
     CGGeometry* volumeVop1_OpInput1 = new CGGeometry(volumeVop_OpInput1_bbox, nullptr, nullptr, velocityField);
 
-    glm::vec3 aabb_min = glm::vec3(-2.01958f, 2.38065f, 4.53478f);
-    glm::vec3 aabb_max = glm::vec3(-1.01958f, 3.38065f, 5.53478f);
-    CGAABB volumeVop_OpInput2_bbox = CGAABB(aabb_min, aabb_max);
+    glm::vec4 aabb_min = glm::vec4(-2.01958f, 2.38065f, 4.53478f, 1.f);
+    glm::vec4 aabb_max = glm::vec4(-1.01958f, 3.38065f, 5.53478f, 1.f);
+    CGAABB volumeVop_OpInput2_bbox = CGAABB(glm::vec3(aabb_min), glm::vec3(aabb_max));
     CGGeometry* volumeVop1_OpInput2 = new CGGeometry(volumeVop_OpInput2_bbox, nullptr, nullptr, nullptr);
 
     // particleAdvectVop_OpInput1: a volume for creating color
@@ -116,7 +117,7 @@ int main() {
 
      // ===== load from task json
     int startFrame = 0;
-    int endFrame = 100;
+    int endFrame = 200;
     float FPS = 24.f;
     int blockSize = 128;
     float TimeInc = 1.0 / FPS;
@@ -149,6 +150,12 @@ int main() {
         float Time = i / FPS;
         float Frame = i;
 
+        glm::mat4 transM = glm::translate(glm::mat4(1.0f), glm::vec3(glm::sin(glm::radians(Frame*2.f)), -0.1524f, glm::cos(glm::radians(Frame * 2.f))));
+        aabb_min = transM * glm::vec4(-2.01958f, 2.38065f, 4.53478f, 1.f);
+        aabb_max = transM * glm::vec4(-1.01958f, 3.38065f, 5.53478f, 1.f);
+        volumeVop_OpInput2_bbox = CGAABB(glm::vec3(aabb_min), glm::vec3(aabb_max));
+        volumeVop1_OpInput2->m_Bbox = volumeVop_OpInput2_bbox;
+
 #if CPU_VERSION
         // particle emitter
         particleGenerator->generateParticlesCPU();
@@ -163,7 +170,7 @@ int main() {
             volumeVop1_OpInput2);
 
         CodeGenerator::ParticleAdvect(
-            particleAdvectVop_offset,
+            TimeInc * Frame,
             particleAdvectVop_input3,
             particleAdvectVop_input2,
             posBuffer, 
@@ -190,7 +197,7 @@ int main() {
         //velocityField->LoadToHost();
 
         CodeGenerator::CUDA::ParticleAdvect(
-            particleAdvectVop_offset,
+            (TimeInc * Frame),
             particleAdvectVop_input3,
             particleAdvectVop_input2,
             posBuffer,
@@ -202,47 +209,29 @@ int main() {
             agePingpongBuffer);
        
         cudaMemcpy(ageBuffer->getDevicePointer(), agePingpongBuffer->getDevicePointer(), sizeof(float) * ageBuffer->getSize(), cudaMemcpyDeviceToDevice);
-        //std::string pathafter = "../userOutputData/vel_field_test/age_aftercopy";
-        //pathafter.append(std::to_string(Frame + 1));
-        //pathafter.append(".obj");
-        //ageBuffer->outputObj(pathafter);
         posBuffer->loadDeviceToHost();
-        //cdBuffer->loadDeviceToHost();
+        cdBuffer->loadDeviceToHost();
 #endif
 
         // save vel_field buffer as obj file
         std::string frame = std::to_string(Frame+1);
         std::string outputObjFilePathBase = "../userOutputData/vel_field_test";
-        std::string velXFilePath = "../userOutputData/vel_field_test/velx_";
-        std::string velYFilePath = "../userOutputData/vel_field_test/vely_";
-        std::string velZFilePath = "../userOutputData/vel_field_test/velz_";
+        std::string velXFilePath = "../userOutputData/vel_field_test/velx_move_";
 
 #if CPU_VERSION
         velXFilePath.append("cpu_");
-        velYFilePath.append("cpu_");
-        velZFilePath.append("cpu_");
+
 #elif GPU_VERSION
         velXFilePath.append("gpu_");
-        velYFilePath.append("gpu_");
-        velZFilePath.append("gpu_");
+
 #endif
         velXFilePath.append(frame);
         velXFilePath.append(".obj");
-        velYFilePath.append(frame);
-        velYFilePath.append(".obj");
-        velZFilePath.append(frame);
-        velZFilePath.append(".obj");
-
-        //posBuffer->outputObj(outputObjFilePath);
-
-        //velocityField->m_FieldX->GetVoxelBufferPtr()->outputObj(velXFilePath);
-        //velocityField->m_FieldY->GetVoxelBufferPtr()->outputObj(velYFilePath);
-        //velocityField->m_FieldZ->GetVoxelBufferPtr()->outputObj(velZFilePath);
-        velocityField->WriteFieldAsObj(velXFilePath);
+        //velocityField->WriteFieldAsObj(velXFilePath);
 
         // save pos buffer as obj file
-        std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_test";
-        std::string cdOutputObjFilePathBase = "../userOutputData/pos/cd_test";
+        std::string posOutputObjFilePathBase = "../userOutputData/pos/pos_noise_move_";
+        std::string cdOutputObjFilePathBase = "../userOutputData/pos/cd_noise_move_";
 
 #if CPU_VERSION
         posOutputObjFilePathBase.append("cpu_");
@@ -257,7 +246,7 @@ int main() {
         cdOutputObjFilePathBase.append(".obj");
 
         posBuffer->outputObj(posOutputObjFilePathBase);
-        //cdBuffer->outputObj(cdOutputObjFilePathBase);
+        cdBuffer->outputObj(cdOutputObjFilePathBase);
         std::cout << "-------- frame: "  << frame << std::endl;
     }
 }
