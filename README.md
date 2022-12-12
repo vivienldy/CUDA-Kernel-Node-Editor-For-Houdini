@@ -2,8 +2,12 @@
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Final Project**
 
+## Hurricane & Smoke With Auto-generated Code
 <p align="center">
-  <img height = "650" alt="auto_generated_hurricane" src="img/hurricane.gif">
+  <img width = "750" alt="auto_generated_hurricane" src="img/hurricane.gif">
+</p>
+<p align="center">
+  <img width = "750" alt="auto_generated_hurricane" src="img/simpleparticle2.gif">
 </p>
 
 ## **Team members:**
