@@ -86,6 +86,9 @@ Therefore, initially, the data would be stored in the class ```CGBuffer```. Then
 After running the calculation, the program will generate an OBJ file to visualize the result on Houdini. The difficult of this part is to build a tenplate code for all of the possible data type. Here, we use a ```void pointer``` to handle the data, so that we can point to different data type without any compilation error. Then, we can output the format we want according to the data type. The OBJ file contains all the position of the points in one specific frame. 
 
 ## Test OBJ Back in Houdini
+<p align="center">
+  <img height = "650" alt="visualization" src="img/visualization.gif">
+</p>
 
 # Results
 ## Example 1: Simple particle
@@ -102,6 +105,4 @@ This custom class aim to generate particles during the program. Since our origin
 <p align="center">
   <img height = "650" alt="auto_generated_hurricane" src="img/hurricane.gif">
 </p>
-
-
 
