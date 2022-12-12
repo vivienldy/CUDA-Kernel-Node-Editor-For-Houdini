@@ -1,3 +1,4 @@
+#include"CGUtility.h"
 #include "@OUT_FILE_NAME@.h"
 #include "@OUT_FILE_NAME@.cuh"
 
@@ -34,9 +35,6 @@ void CodeGenerator::CUDA::@KERNEL_LAUNCH_NAME@ (
     @KERNEL_LAUNCH_PARM_DECLARE_LIST@
     int blockSize)
 {
-    // Buffer malloc
-    @BUFFER_MALLOC@
-
     // Compute threads num
     int numOfThreads = @REF_BUFFER_NAME@
     // Compute blocks num

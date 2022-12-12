@@ -5,7 +5,7 @@ namespace CodeGenerator
 { 
 	namespace GenericCode 
  	{ 
-        __host__ __device__ inline void ParticleAdvect(glm::vec3 geo1_ParticleAdvect_offset_offset, float geo1_ParticleAdvect_input3_input3, float geo1_ParticleAdvect_input2_input2, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Pbuffer, float* geo1_ParticleAdvect_geometryvopglobal1_agebuffer, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer, float geo1_ParticleAdvect_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput1, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput2, float* __geo1_ParticleAdvect_add1_sum_debug_buffer, int idx)
+        __host__ __device__ inline void ParticleAdvect(float geo1_ParticleAdvect_parameter_time, float geo1_ParticleAdvect_input3_input3, float geo1_ParticleAdvect_input2_input2, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Pbuffer, float* geo1_ParticleAdvect_geometryvopglobal1_agebuffer, glm::vec3* geo1_ParticleAdvect_geometryvopglobal1_Cdbuffer, float geo1_ParticleAdvect_geometryvopglobal1_TimeInc, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput1, CGGeometry::RAWData geo1_ParticleAdvect_geometryvopglobal1_OpInput2, float* __geo1_ParticleAdvect_add1_sum_debug_buffer, int idx)
         {
             // Data Load 
             // Geometry Global Input
@@ -31,8 +31,8 @@ float geo1_ParticleAdvect_volumesamplefile3_volumevalue = volumesamplefile(geo1_
  // Generate by floattovec1
 glm::vec3 geo1_ParticleAdvect_floattovec1_vec = floattovec(geo1_ParticleAdvect_volumesamplefile1_volumevalue, geo1_ParticleAdvect_volumesamplefile2_volumevalue, geo1_ParticleAdvect_volumesamplefile3_volumevalue);
 
- // Generate by curlnoise1
-glm::vec3 geo1_ParticleAdvect_curlnoise1_noise = curlnoise(char(pnoise), geo1_ParticleAdvect_geometryvopglobal1_P, glm::vec3(1.0f,1.0f,1.0f), geo1_ParticleAdvect_offset_offset, float(1.0f), float(0.5f), float(1.0f), int(3), float(0.0001f), float(1.0f), float(1.0f), glm::vec3(0.0f,0.0f,0.0f), char(), int(0));
+ // Generate by xnoise
+glm::vec3 geo1_ParticleAdvect_xnoise_noise = xnoise(geo1_ParticleAdvect_geometryvopglobal1_OpInput1, geo1_ParticleAdvect_geometryvopglobal1_P, glm::vec3(0.5f,0.5f,0.5f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,0.0f), int(3), int(0), float(2.0f), float(0.5f), float(1.0f), float(0.001f), geo1_ParticleAdvect_parameter_time);
 
  // Generate by createColor
 glm::vec3 geo1_ParticleAdvect_createColor__Cd = createColor(geo1_ParticleAdvect_geometryvopglobal1_P, geo1_ParticleAdvect_geometryvopglobal1_age, geo1_ParticleAdvect_geometryvopglobal1_Cd, geo1_ParticleAdvect_geometryvopglobal1_OpInput1, geo1_ParticleAdvect_geometryvopglobal1_TimeInc);
@@ -59,7 +59,7 @@ glm::vec3 geo1_ParticleAdvect_floattovec2_vec = floattovec(float(0.0f), geo1_Par
 glm::vec3 geo1_ParticleAdvect_add3_sum = geo1_ParticleAdvect_floattovec2_vec;
 
  // Generate by add2
-glm::vec3 geo1_ParticleAdvect_add2_sum = geo1_ParticleAdvect_multiply1_product + geo1_ParticleAdvect_add3_sum + geo1_ParticleAdvect_curlnoise1_noise;
+glm::vec3 geo1_ParticleAdvect_add2_sum = geo1_ParticleAdvect_multiply1_product + geo1_ParticleAdvect_add3_sum + geo1_ParticleAdvect_xnoise_noise;
 
  // Generate by multiply3
 glm::vec3 geo1_ParticleAdvect_multiply3_product = geo1_ParticleAdvect_add2_sum * geo1_ParticleAdvect_geometryvopglobal1_TimeInc;
