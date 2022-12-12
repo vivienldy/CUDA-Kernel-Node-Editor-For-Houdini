@@ -76,6 +76,9 @@ Now, suppose we need to implement this effect on both the CPU and GPU.
 On the CPU, we will use a for loop to iterate over each particle and update their position using this formula. While on the GPU side, we'll call kernel launch and let each kernel compute the new position in parallel.
 
 Although the way of traversing the particles is different, the code used to calculate its new position is the same. This line of code is an example of CPU-GPU Generic code.
+<p align="center">
+  <img height = "650" alt="visualization" src="img/generate.gif">
+</p>
 
 ## Read in Houdini data (CGBuffer)
 To properly handle the data from Houdini, we created a helper class ```CGBuffer```. With this helper class, we can maintain the memory usage in both Host and Device using fixed functions. This greatly reduces the difficulty of generating real codes as we can use fixed functions to replace original codes.
